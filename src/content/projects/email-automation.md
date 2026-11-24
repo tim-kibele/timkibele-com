@@ -10,7 +10,7 @@ year: 2026
 detail:
   de:
     summary: Eine Automation für das zentrale Postfach eines kleinen Handwerksbetriebs. Sie erkennt Kundenanfragen, fragt fehlende Angaben wie Foto und Adresse selbstständig nach und behält verschickte Angebote im Blick, damit rechtzeitig nachgefasst wird.
-    motivation: Platzhalter. Warum ich das Projekt gebaut habe, folgt.
+    motivation: Ein kleiner Betrieb verliert Zeit und Aufträge, wenn Anfragen und Angebote im Postfach liegen bleiben. Die Automation soll dieses Nachfassen übernehmen, damit das Büro sich auf die Fälle konzentrieren kann, die einen Menschen brauchen.
     learnings:
       - title: Prozesse als Zustandsautomat
         text: Jeder Vorgang hat einen Status, Fristen und klar definierte Übergänge. Das ist etwas anderes als ein linearer Ablauf.
@@ -32,7 +32,7 @@ detail:
     note: Kundenprojekt, anonymisiert. Es gibt keinen öffentlichen Link.
   en:
     summary: An automation for the central mailbox of a small trades business. It recognises customer enquiries, asks for missing details such as a photo and an address on its own, and keeps track of sent quotes so they get followed up in time.
-    motivation: Placeholder. Why I built this project is still to come.
+    motivation: A small business loses time and jobs when enquiries and quotes sit unanswered in a mailbox. The automation takes over that follow-up so the office can focus on the cases that need a human.
     learnings:
       - title: Processes as a state machine
         text: Every case has a status, deadlines and clearly defined transitions. That is different from a linear flow.
