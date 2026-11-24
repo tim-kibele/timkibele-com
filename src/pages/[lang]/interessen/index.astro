@@ -1,0 +1,23 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { languages, t, type Lang } from '../../../i18n/ui';
+
+export function getStaticPaths() {
+  return languages.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+const tr = t(lang);
+---
+<Base lang={lang} title={tr.interests.title} description={tr.interests.intro} path="interessen/">
+  <h1>{tr.interests.title}</h1>
+  <p class="lead">{tr.interests.intro}</p>
+
+  <div class="detail">
+    {tr.interests.items.map((item) => (
+      <section>
+        <h2>{item}</h2>
+        <p>{tr.interests.note}</p>
+      </section>
+    ))}
+  </div>
+</Base>

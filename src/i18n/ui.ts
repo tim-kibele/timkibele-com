@@ -5,7 +5,7 @@ export const ui = {
   de: {
     siteTitle: 'Tim Kibele',
     tagline: 'Entwickler, Tüftler, Neugieriger.',
-    nav: { home: 'Start', projects: 'Projekte', reports: 'Berichte', cv: 'Lebenslauf', legal: 'Datenschutz' },
+    nav: { home: 'Start', projects: 'Projekte', interests: 'Interessen', cv: 'Lebenslauf', legal: 'Datenschutz' },
     home: {
       heading: 'Hallo, ich bin Tim.',
       intro: 'Hier zeige ich, woran ich arbeite und was ich dabei lerne.',
@@ -15,8 +15,13 @@ export const ui = {
       closing: 'Schreib mir.',
       closingNote: 'Kontaktadresse folgt.',
     },
-    projects: { title: 'Projekte', intro: 'Meine Projekte laufen auf eigenen (Sub-)Domains. Hier findest du die Übersicht.', open: 'Öffnen', code: 'Code', motivation: 'Motivation', learnings: 'Learnings', stack: 'Stack' },
-    reports: { title: 'Berichte', intro: 'Hintergründe, Entscheidungen und Learnings zu meinen Projekten.', empty: 'Noch keine Berichte.' },
+    projects: { title: 'Projekte', intro: 'Meine Projekte. Hier findest du die Übersicht.', open: 'Öffnen', code: 'Code', motivation: 'Motivation', learnings: 'Learnings', stack: 'Stack' },
+    interests: {
+      title: 'Interessen',
+      intro: 'Wofür ich mich interessiere: KI, Gaming und mechanische Tastaturen.',
+      note: 'Text folgt.',
+      items: ['KI', 'Gaming', 'Mechanische Tastaturen'],
+    },
     cv: { title: 'Lebenslauf' },
     legal: { title: 'Datenschutz' },
     switchTo: 'English',
@@ -26,7 +31,7 @@ export const ui = {
   en: {
     siteTitle: 'Tim Kibele',
     tagline: 'Developer, tinkerer, curious mind.',
-    nav: { home: 'Home', projects: 'Projects', reports: 'Write-ups', cv: 'CV', legal: 'Privacy' },
+    nav: { home: 'Home', projects: 'Projects', interests: 'Interests', cv: 'CV', legal: 'Privacy' },
     home: {
       heading: "Hi, I'm Tim.",
       intro: 'Here I share what I work on and what I learn.',
@@ -36,8 +41,13 @@ export const ui = {
       closing: 'Get in touch.',
       closingNote: 'Contact address to follow.',
     },
-    projects: { title: 'Projects', intro: 'My projects live on their own (sub)domains. This is the overview.', open: 'Open', code: 'Code', motivation: 'Motivation', learnings: 'Learnings', stack: 'Stack' },
-    reports: { title: 'Write-ups', intro: 'Background, decisions and learnings about my projects.', empty: 'No write-ups yet.' },
+    projects: { title: 'Projects', intro: 'My projects. Here you will find the overview.', open: 'Open', code: 'Code', motivation: 'Motivation', learnings: 'Learnings', stack: 'Stack' },
+    interests: {
+      title: 'Interests',
+      intro: 'What I am into: AI, gaming and mechanical keyboards.',
+      note: 'Text to come.',
+      items: ['AI', 'Gaming', 'Mechanical keyboards'],
+    },
     cv: { title: 'CV' },
     legal: { title: 'Privacy policy' },
     switchTo: 'Deutsch',

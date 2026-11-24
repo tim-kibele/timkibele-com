@@ -29,15 +29,4 @@ const projects = defineCollection({
   }),
 });
 
-// Berichte liegen pro Sprache in src/content/reports/<lang>/<slug>.md
-const reports = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/reports' }),
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    date: z.coerce.date(),
-    project: z.string().optional(),
-  }),
-});
-
-export const collections = { projects, reports };
+export const collections = { projects };
