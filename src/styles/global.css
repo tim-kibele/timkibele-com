@@ -48,21 +48,6 @@ h2 { margin-top: var(--space-2xl); }
 .topics { margin-top: var(--space-xl); }
 .topics a { grid-template-columns: minmax(0, 1fr); }
 
-/* interests: delegate-or-check game on the AI page */
-.game { margin-top: var(--space-xl); padding-top: var(--space-lg); border-top: var(--rule-hair) solid var(--color-rule); }
-.game h2 { font-size: var(--text-xl); }
-.game-stage { margin-top: var(--space-lg); min-height: 16rem; }
-.game .btn { font: inherit; font-weight: 500; cursor: pointer; }
-.game .btn:not(.btn--primary) { background: transparent; }
-.game .btn:not(.btn--primary):hover { background: var(--tint-moss); }
-.game-card { max-width: 40rem; }
-.game-meta { color: var(--color-muted); font-size: var(--text-sm); margin: 0; }
-.game-task { margin: var(--space-xs) 0 0; color: var(--color-ink); }
-.game pre { margin: var(--space-md) 0; padding: var(--space-md); background: var(--color-paper-2); border: var(--rule-hair) solid var(--color-rule); border-radius: var(--radius-card); overflow-x: auto; font-family: var(--font-mono); font-size: var(--text-sm); }
-.game-actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
-.game-result { margin: 0 0 var(--space-md); color: var(--color-ink); }
-.game .btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
-
 /* project detail */
 .detail h2 { font-size: var(--text-xl); margin-top: var(--space-xl); }
 .detail ul { margin: var(--space-sm) 0 0; padding-left: 1.2em; max-width: 65ch; }
@@ -108,16 +93,16 @@ h2 { margin-top: var(--space-2xl); }
 .scan .hist .ht { fill: var(--color-ink); font-weight: 500; }
 .scan .hist.new .hd, .scan .hist.new .ht { fill: var(--color-accent); }
 
-/* animation: workflow (email automation page) */
-.workflow .edge { fill: none; stroke: var(--color-rule-2); stroke-width: 1.2; transition: stroke var(--dur-long) var(--ease-out); }
-.workflow .edge.on { stroke: var(--color-accent); }
-.workflow .wf-node { color: var(--color-muted); transition: color var(--dur-long) var(--ease-out); }
-.workflow .wf-node rect { fill: var(--color-paper); stroke: var(--color-rule-2); stroke-width: 1; transition: stroke var(--dur-long) var(--ease-out); }
-.workflow .wf-node .wf-icon { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-.workflow .wf-node .wf-icon .dot { fill: currentColor; }
-.workflow .wf-node.on { color: var(--color-accent); }
-.workflow .wf-node.on rect { stroke: var(--color-accent); }
-.workflow .pulse { fill: var(--color-accent); }
+/* animation: workflow (email automation page), agents (AI page) share the node look */
+.workflow .edge, .agents .edge { fill: none; stroke: var(--color-rule-2); stroke-width: 1.2; transition: stroke var(--dur-long) var(--ease-out); }
+.workflow .edge.on, .agents .edge.on { stroke: var(--color-accent); }
+.workflow .wf-node, .agents .wf-node { color: var(--color-muted); transition: color var(--dur-long) var(--ease-out); }
+.workflow .wf-node rect, .agents .wf-node rect { fill: var(--color-paper); stroke: var(--color-rule-2); stroke-width: 1; transition: stroke var(--dur-long) var(--ease-out); }
+.workflow .wf-node .wf-icon, .agents .wf-node .wf-icon { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.workflow .wf-node .wf-icon .dot, .agents .wf-node .wf-icon .dot { fill: currentColor; }
+.workflow .wf-node.on, .agents .wf-node.on { color: var(--color-accent); }
+.workflow .wf-node.on rect, .agents .wf-node.on rect { stroke: var(--color-accent); }
+.workflow .pulse, .agents .pulse { fill: var(--color-accent); }
 
 /* animation: neural net */
 .neural-net .edge { stroke: var(--color-rule); stroke-width: 0.8; stroke-opacity: 0.8; transition: stroke var(--dur-long) var(--ease-out), stroke-opacity var(--dur-long) var(--ease-out); }

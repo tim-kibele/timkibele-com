@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
-import DelegateGame from '../../../components/DelegateGame.astro';
+import { animations } from '../../../components/animations';
 import { languages, t, type Lang } from '../../../i18n/ui';
 
 export async function getStaticPaths() {
@@ -13,11 +13,12 @@ const slug = Astro.params.slug!;
 const { item } = Astro.props;
 const tr = t(lang);
 const title = item.data.title[lang];
+const Animation = item.data.animation ? animations[item.data.animation] : null;
 const paragraphs = (item.data.text?.[lang] ?? tr.interests.note).split(/\n\s*\n/);
 ---
 <Base lang={lang} title={title} description={tr.interests.intro} path={`interessen/${slug}/`}>
+  {Animation && <Animation />}
   <p><a href={`/${lang}/interessen/`}>← {tr.back}</a></p>
   <h1>{title}</h1>
   {paragraphs.map((p, i) => <p class={i === 0 ? 'lead' : undefined}>{p}</p>)}
-  {slug === 'ki' && <DelegateGame lang={lang} />}
 </Base>

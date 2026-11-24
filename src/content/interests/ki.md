@@ -2,6 +2,7 @@
 title:
   de: KI
   en: AI
+animation: agents
 text:
   de: |-
     KI verblüfft mich, aber sie macht mir keine Angst. Ich glaube nicht, dass wir von ihr ersetzt werden. Wir können sie uns zunutze machen, und wer das meistert, kommt voran. Wer KI nutzt, wird in Zukunft die schlagen, die es nicht tun.
