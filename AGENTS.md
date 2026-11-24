@@ -27,3 +27,8 @@ Consult these guides before working on related tasks:
 - Jede Projektseite hat außerdem eine kleine, dekorative Animation am rechten Rand. Das Projekt wählt sie mit `animation: <name>`. Die Komponenten liegen in `src/components/animations/`, registriert werden sie in `src/components/animations/index.ts` und in der Enum `animation` in `src/content.config.ts`.
 - Regeln für eine Animation: Klasse `margin-art` am Wurzelelement (verankert sie oben am rechten Seitenrand, sie scrollt mit der Seite weg, und blendet sie unter 77rem aus), `aria-hidden`, die Struktur als festes SVG, damit sie ohne JavaScript und bei `prefers-reduced-motion` stillsteht, Farben nur über Tokens, nur `transform` und `opacity` bzw. Farbwechsel animieren.
 - Commit-Messages auf Englisch (siehe `../CLAUDE.md`).
+
+## Texte
+
+- Jeder Text auf der Seite (DE und EN) läuft vor dem Zeigen und Committen durch den Skill `humanizer` (`.claude/skills/humanizer/`, https://github.com/blader/humanizer). Fakten, Zahlen und Namen bleiben unverändert, die Stimme des Autors bleibt erhalten, nichts wird erfunden.
+- Interessenseiten: `src/content/interests/<thema>.md`, Feld `text` je Sprache; eine Leerzeile trennt Absätze.

@@ -12,9 +12,10 @@ const slug = Astro.params.slug!;
 const { item } = Astro.props;
 const tr = t(lang);
 const title = item.data.title[lang];
+const paragraphs = (item.data.text?.[lang] ?? tr.interests.note).split(/\n\s*\n/);
 ---
 <Base lang={lang} title={title} description={tr.interests.intro} path={`interessen/${slug}/`}>
   <p><a href={`/${lang}/interessen/`}>← {tr.back}</a></p>
   <h1>{title}</h1>
-  <p class="lead">{item.data.text?.[lang] ?? tr.interests.note}</p>
+  {paragraphs.map((p, i) => <p class={i === 0 ? 'lead' : undefined}>{p}</p>)}
 </Base>
