@@ -7,8 +7,78 @@ export function getStaticPaths() {
 }
 const lang = Astro.params.lang as Lang;
 const tr = t(lang);
+
+type Row = { when?: string; title: string; org?: string; text?: string };
+const cv = {
+  de: {
+    profile: 'Informatikstudent an der LMU München mit dem Ziel eines Masters in Informatik mit Spezialisierung auf KI. Ich interessiere mich für alles rund um Technik, vor allem für KI, Gaming und mechanische Tastaturen.',
+    headings: { experience: 'Berufserfahrung', education: 'Ausbildung', skills: 'Fähigkeiten', languages: 'Sprachen' },
+    experience: [
+      { when: '09/2026 – heute', title: 'Werkstudent', org: 'Onyva Innovation' },
+      { when: '04/2026 – 09/2026', title: 'Tutor', org: 'LMU München', text: 'Tutorium zur Vorlesung „Logik und diskrete Strukturen“' },
+    ] as Row[],
+    education: [
+      { when: '2024 – heute', title: 'Informatik mit integriertem Anwendungsfach Mathematik (B. Sc.)', org: 'LMU München' },
+      { when: '2023 – 2024', title: 'Informatik (B. Sc.)', org: 'RWU Weingarten' },
+    ] as Row[],
+    skills: [
+      { title: 'Programmiersprachen', text: 'Python, Java, Haskell, JavaScript, C (Grundkenntnisse)' },
+      { title: 'Technologien', text: 'n8n und Webhooks, asyncio und httpx, Tkinter, reguläre Ausdrücke, Sprachmodelle (OpenAI) in Automationen' },
+    ] as Row[],
+    languages: [
+      { title: 'Deutsch', text: 'Muttersprache' },
+      { title: 'Englisch', text: 'C1' },
+    ] as Row[],
+  },
+  en: {
+    profile: 'Computer science student at LMU Munich, aiming for a master’s degree in computer science with a specialisation in AI. I am interested in everything to do with technology, above all AI, gaming and mechanical keyboards.',
+    headings: { experience: 'Experience', education: 'Education', skills: 'Skills', languages: 'Languages' },
+    experience: [
+      { when: '09/2026 – present', title: 'Working student', org: 'Onyva Innovation' },
+      { when: '04/2026 – 09/2026', title: 'Tutor', org: 'LMU Munich', text: 'Tutorial for the lecture “Logic and Discrete Structures”' },
+    ] as Row[],
+    education: [
+      { when: '2024 – present', title: 'Computer Science with Mathematics as the integrated minor (B.Sc.)', org: 'LMU Munich' },
+      { when: '2023 – 2024', title: 'Computer Science (B.Sc.)', org: 'RWU Weingarten' },
+    ] as Row[],
+    skills: [
+      { title: 'Programming languages', text: 'Python, Java, Haskell, JavaScript, C (basics)' },
+      { title: 'Technologies', text: 'n8n and webhooks, asyncio and httpx, Tkinter, regular expressions, language models (OpenAI) in automations' },
+    ] as Row[],
+    languages: [
+      { title: 'German', text: 'Native' },
+      { title: 'English', text: 'C1' },
+    ] as Row[],
+  },
+}[lang];
+const sections = [
+  [cv.headings.experience, cv.experience],
+  [cv.headings.education, cv.education],
+  [cv.headings.skills, cv.skills],
+  [cv.headings.languages, cv.languages],
+] as const;
 ---
-<Base lang={lang} title={tr.cv.title} path="lebenslauf/">
+<Base lang={lang} title={tr.cv.title} description={cv.profile} path="lebenslauf/">
   <h1>{tr.cv.title}</h1>
-  <p class="lead">{lang === 'de' ? 'Platzhalter – hier kommen Stationen, Skills und Ausbildung hin.' : 'Placeholder – experience, skills and education go here.'}</p>
+  <p class="lead">{cv.profile}</p>
+
+  <div class="cv">
+    {sections.map(([heading, rows]) => (
+      <section>
+        <h2>{heading}</h2>
+        <ul class="cv-rows">
+          {rows.map((r) => (
+            <li class="cv-row">
+              <span class="when">{r.when}</span>
+              <div>
+                <h3>{r.title}</h3>
+                {r.org && <p class="org">{r.org}</p>}
+                {r.text && <p class="org">{r.text}</p>}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
 </Base>
