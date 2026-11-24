@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
+import DelegateGame from '../../../components/DelegateGame.astro';
 import { languages, t, type Lang } from '../../../i18n/ui';
 
 export async function getStaticPaths() {
@@ -18,4 +19,5 @@ const paragraphs = (item.data.text?.[lang] ?? tr.interests.note).split(/\n\s*\n/
   <p><a href={`/${lang}/interessen/`}>← {tr.back}</a></p>
   <h1>{title}</h1>
   {paragraphs.map((p, i) => <p class={i === 0 ? 'lead' : undefined}>{p}</p>)}
+  {slug === 'ki' && <DelegateGame lang={lang} />}
 </Base>

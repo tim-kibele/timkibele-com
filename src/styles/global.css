@@ -48,6 +48,21 @@ h2 { margin-top: var(--space-2xl); }
 .topics { margin-top: var(--space-xl); }
 .topics a { grid-template-columns: minmax(0, 1fr); }
 
+/* interests: delegate-or-check game on the AI page */
+.game { margin-top: var(--space-xl); padding-top: var(--space-lg); border-top: var(--rule-hair) solid var(--color-rule); }
+.game h2 { font-size: var(--text-xl); }
+.game-stage { margin-top: var(--space-lg); min-height: 16rem; }
+.game .btn { font: inherit; font-weight: 500; cursor: pointer; }
+.game .btn:not(.btn--primary) { background: transparent; }
+.game .btn:not(.btn--primary):hover { background: var(--tint-moss); }
+.game-card { max-width: 40rem; }
+.game-meta { color: var(--color-muted); font-size: var(--text-sm); margin: 0; }
+.game-task { margin: var(--space-xs) 0 0; color: var(--color-ink); }
+.game pre { margin: var(--space-md) 0; padding: var(--space-md); background: var(--color-paper-2); border: var(--rule-hair) solid var(--color-rule); border-radius: var(--radius-card); overflow-x: auto; font-family: var(--font-mono); font-size: var(--text-sm); }
+.game-actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+.game-result { margin: 0 0 var(--space-md); color: var(--color-ink); }
+.game .btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
 /* project detail */
 .detail h2 { font-size: var(--text-xl); margin-top: var(--space-xl); }
 .detail ul { margin: var(--space-sm) 0 0; padding-left: 1.2em; max-width: 65ch; }

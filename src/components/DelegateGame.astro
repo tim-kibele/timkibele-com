@@ -1,0 +1,165 @@
+---
+import type { Lang } from '../i18n/ui';
+
+// Kleines Spiel für die KI-Seite: Ein fiktiver Agent liefert sechs Ergebnisse, vier davon mit Fehler.
+// Alles ist fest vorgegeben, nichts hier beschreibt reale Vorfälle.
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const text = {
+  de: {
+    title: 'Delegieren oder prüfen',
+    intro: 'Ein KI-Agent erledigt sechs Aufgaben für dich. Bei jedem Ergebnis entscheidest du, ob du es übernimmst oder zuerst prüfst. Prüfen kostet 5 Minuten. Ein übersehener Fehler kostet je nach Aufgabe wenig oder viel.',
+    start: 'Spiel starten',
+    task: 'Aufgabe',
+    stakes: { low: 'Folgen eines Fehlers: gering', high: 'Folgen eines Fehlers: hoch' },
+    accept: 'Übernehmen',
+    check: 'Prüfen (5 Min)',
+    next: 'Weiter',
+    finish: 'Auswertung',
+    again: 'Nochmal spielen',
+    fine: 'Das Ergebnis war richtig.',
+    slipped: 'Der Fehler ist durchgerutscht: ',
+    found: 'Fehler gefunden: ',
+    missed: 'Übersehene Fehler',
+    time: 'Prüfzeit',
+    min: 'Min',
+    verdictHigh: 'Bei hohen Folgen ist ein übersehener Fehler teuer. Dort lohnt sich das Prüfen.',
+    verdictOver: 'Du hast auch dort geprüft, wo wenig auf dem Spiel stand. Das kostet Zeit, die du sparen kannst.',
+    verdictGood: 'Du hast geprüft, wo viel auf dem Spiel stand, und den Rest durchgelassen. Das ist kontrolliertes Delegieren.',
+    noscript: 'Das Spiel braucht JavaScript.',
+  },
+  en: {
+    title: 'Delegate or check',
+    intro: 'An AI agent does six tasks for you. For each result you decide whether to accept it or check it first. Checking costs 5 minutes. A missed error costs little or a lot, depending on the task.',
+    start: 'Start the game',
+    task: 'Task',
+    stakes: { low: 'Cost of an error: low', high: 'Cost of an error: high' },
+    accept: 'Accept',
+    check: 'Check (5 min)',
+    next: 'Next',
+    finish: 'Results',
+    again: 'Play again',
+    fine: 'The result was correct.',
+    slipped: 'The error slipped through: ',
+    found: 'Error found: ',
+    missed: 'Missed errors',
+    time: 'Checking time',
+    min: 'min',
+    verdictHigh: 'When the cost is high, a missed error is expensive. That is where checking pays off.',
+    verdictOver: 'You also checked where little was at stake. That costs time you can save.',
+    verdictGood: 'You checked where a lot was at stake and let the rest through. That is controlled delegation.',
+    noscript: 'The game needs JavaScript.',
+  },
+}[lang];
+
+const tasks = {
+  de: [
+    { task: 'Sortiere eine Liste von Zahlen.', code: 'def sort_numbers(xs):\n    return sorted(xs)', stakes: 'low', bug: null },
+    { task: 'Gib 10 % Rabatt ab einem Warenwert von 100 Euro.', code: 'if total > 100:\n    total = total * 0.9', stakes: 'high', bug: 'Bei genau 100 Euro gibt es keinen Rabatt. Richtig wäre >=.' },
+    { task: 'Gib den Dateinamen ohne Endung zurück.', code: 'def stem(name):\n    return name.split(".")[0]', stakes: 'low', bug: 'Bei archiv.tar.gz bleibt nur archiv übrig.' },
+    { task: 'Lösche Logdateien, die älter als 30 Tage sind.', code: 'if age_days < 30:\n    os.remove(path)', stakes: 'high', bug: 'Die Bedingung ist umgekehrt. Das Skript löscht die neuen Logs und behält die alten.' },
+    { task: 'Lies die Datei daten.csv in eine Tabelle ein.', code: 'df = pandas.read_csv_fast("daten.csv")', stakes: 'low', bug: 'Die Funktion read_csv_fast gibt es in pandas nicht. Richtig ist read_csv.' },
+    { task: 'Prüfe, ob eine Person volljährig ist.', code: 'def is_adult(age):\n    return age >= 18', stakes: 'high', bug: null },
+  ],
+  en: [
+    { task: 'Sort a list of numbers.', code: 'def sort_numbers(xs):\n    return sorted(xs)', stakes: 'low', bug: null },
+    { task: 'Give a 10% discount on orders of 100 euros or more.', code: 'if total > 100:\n    total = total * 0.9', stakes: 'high', bug: 'An order of exactly 100 euros gets no discount. It should be >=.' },
+    { task: 'Return the file name without its extension.', code: 'def stem(name):\n    return name.split(".")[0]', stakes: 'low', bug: 'For archive.tar.gz only archive is left.' },
+    { task: 'Delete log files that are older than 30 days.', code: 'if age_days < 30:\n    os.remove(path)', stakes: 'high', bug: 'The condition is reversed. The script deletes the new logs and keeps the old ones.' },
+    { task: 'Read the file data.csv into a table.', code: 'df = pandas.read_csv_fast("data.csv")', stakes: 'low', bug: 'pandas has no function called read_csv_fast. The right one is read_csv.' },
+    { task: 'Check whether a person is an adult.', code: 'def is_adult(age):\n    return age >= 18', stakes: 'high', bug: null },
+  ],
+}[lang];
+---
+<section class="game" data-tasks={JSON.stringify(tasks)} data-text={JSON.stringify(text)}>
+  <h2>{text.title}</h2>
+  <p>{text.intro}</p>
+  <div class="game-stage" aria-live="polite"></div>
+  <noscript><p>{text.noscript}</p></noscript>
+</section>
+
+<script>
+  const root = document.querySelector<HTMLElement>('.game');
+  if (root) {
+    const tasks: { task: string; code: string; stakes: 'low' | 'high'; bug: string | null }[] = JSON.parse(root.dataset.tasks!);
+    const t = JSON.parse(root.dataset.text!);
+    const stage = root.querySelector<HTMLElement>('.game-stage')!;
+    const CHECK_MIN = 5;
+
+    const el = <K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string) => {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text !== undefined) e.textContent = text;
+      return e;
+    };
+    const button = (label: string, onClick: () => void, primary = false) => {
+      const b = el('button', primary ? 'btn btn--primary' : 'btn', label);
+      b.type = 'button';
+      b.addEventListener('click', onClick);
+      return b;
+    };
+
+    let i = 0;
+    let checks = 0;
+    let checkedLow = 0;
+    let missed = 0;
+    let missedHigh = 0;
+
+    const intro = () => {
+      i = checks = checkedLow = missed = missedHigh = 0;
+      stage.replaceChildren(button(t.start, show, true));
+    };
+
+    const show = () => {
+      const k = tasks[i];
+      const card = el('div', 'game-card');
+      card.append(
+        el('p', 'game-meta', `${t.task} ${i + 1} / ${tasks.length}. ${t.stakes[k.stakes]}`),
+        el('p', 'game-task', k.task),
+      );
+      const pre = el('pre');
+      pre.append(el('code', undefined, k.code));
+      card.append(pre);
+      const actions = el('div', 'game-actions');
+      const decide = (checked: boolean) => {
+        actions.remove();
+        let line: string;
+        if (checked) {
+          checks += 1;
+          if (k.stakes === 'low') checkedLow += 1;
+          line = k.bug ? t.found + k.bug : t.fine;
+        } else if (k.bug) {
+          missed += 1;
+          if (k.stakes === 'high') missedHigh += 1;
+          line = t.slipped + k.bug;
+        } else {
+          line = t.fine;
+        }
+        const last = i === tasks.length - 1;
+        card.append(
+          el('p', 'game-result', line),
+          button(last ? t.finish : t.next, () => { i += 1; last ? summary() : show(); }, true),
+        );
+      };
+      actions.append(button(t.accept, () => decide(false)), button(t.check, () => decide(true)));
+      card.append(actions);
+      stage.replaceChildren(card);
+      (card.querySelector('button') as HTMLButtonElement).focus({ preventScroll: true });
+    };
+
+    const summary = () => {
+      const bugs = tasks.filter((k) => k.bug).length;
+      const verdict = missedHigh > 0 ? t.verdictHigh : checkedLow >= 2 ? t.verdictOver : t.verdictGood;
+      const card = el('div', 'game-card');
+      card.append(
+        el('p', 'game-task', `${t.missed}: ${missed} / ${bugs}. ${t.time}: ${checks * CHECK_MIN} ${t.min}.`),
+        el('p', 'game-result', verdict),
+        button(t.again, intro),
+      );
+      stage.replaceChildren(card);
+    };
+
+    intro();
+  }
+</script>
