@@ -4,7 +4,7 @@ export type Lang = (typeof languages)[number];
 export const ui = {
   de: {
     siteTitle: 'Tim Kibele',
-    tagline: 'Entwickler, Tüftler, Neugieriger.',
+    tagline: 'Informatikstudent an der LMU München.',
     nav: { home: 'Start', projects: 'Projekte', interests: 'Interessen', cv: 'Lebenslauf', legal: 'Datenschutz' },
     home: {
       heading: 'Hallo, ich bin Tim.',
@@ -29,7 +29,7 @@ export const ui = {
   },
   en: {
     siteTitle: 'Tim Kibele',
-    tagline: 'Developer, tinkerer, curious mind.',
+    tagline: 'Computer science student at LMU Munich.',
     nav: { home: 'Home', projects: 'Projects', interests: 'Interests', cv: 'CV', legal: 'Privacy' },
     home: {
       heading: "Hi, I'm Tim.",

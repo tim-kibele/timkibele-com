@@ -17,13 +17,13 @@ detail:
       - title: Python vertieft
         text: Ich habe in einer größeren, fremden Codebasis gearbeitet und meinen Python-Code an deren Stil und Struktur angepasst.
       - title: PyTorch in der Praxis
-        text: Die Tests für die Torch-Implementierung von DropConnect haben mir PyTorch aus nächster Nähe gezeigt.
+        text: Ich habe die Torch-Implementierung von DropConnect getestet und dabei PyTorch praktisch kennengelernt.
       - title: Testen mit pytest
-        text: Unit-Tests für Module zu schreiben, die mit Modellen arbeiten, statt nur mit einfachen Funktionen, etwa für DropConnect und Ensembles.
+        text: Ich habe Unit-Tests für Module geschrieben, die mit Modellen arbeiten, etwa für DropConnect und Ensembles.
       - title: Zu Open Source beitragen
         text: Vom Issue über den Pull Request bis zum Merge, mit Rückmeldungen im Review.
       - title: Mehr Verständnis für ML
-        text: Um DropConnect und Ensembles zu testen und Masksembles zu erklären, musste ich sie wirklich verstehen. Das hat mein Wissen über Unsicherheit in ML-Modellen vertieft.
+        text: Um DropConnect und Ensembles zu testen und Masksembles zu erklären, musste ich sie verstehen. Das hat mein Wissen über Unsicherheit in ML-Modellen vertieft.
     stack:
       - Python
       - PyTorch
@@ -39,13 +39,13 @@ detail:
       - title: Deepened my Python
         text: I worked in a larger codebase that was not mine and adapted my Python code to its style and structure.
       - title: PyTorch in practice
-        text: Writing the tests for the Torch implementation of DropConnect showed me PyTorch up close.
+        text: I tested the Torch implementation of DropConnect and got to know PyTorch hands-on.
       - title: Testing with pytest
-        text: Writing unit tests for modules that work with models, not just simple functions, such as DropConnect and ensembles.
+        text: I wrote unit tests for modules that work with models, such as DropConnect and ensembles.
       - title: Contributing to open source
         text: From the issue through the pull request to the merge, with feedback in review.
       - title: A better grasp of ML
-        text: To test DropConnect and ensembles and to explain Masksembles I had to really understand them. That deepened my knowledge of uncertainty in ML models.
+        text: To test DropConnect and ensembles and to explain Masksembles I had to understand them. That deepened my knowledge of uncertainty in ML models.
     stack:
       - Python
       - PyTorch

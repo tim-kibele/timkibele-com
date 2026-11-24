@@ -14,7 +14,7 @@ detail:
     motivation: Ein kleiner Betrieb verliert Zeit und Aufträge, wenn Anfragen und Angebote im Postfach liegen bleiben. Die Automation soll dieses Nachfassen übernehmen, damit das Büro sich auf die Fälle konzentrieren kann, die einen Menschen brauchen.
     learnings:
       - title: Prozesse als Zustandsautomat
-        text: Jeder Vorgang hat einen Status, Fristen und klar definierte Übergänge. Das ist etwas anderes als ein linearer Ablauf.
+        text: Jeder Vorgang hat einen Status, Fristen und klar definierte Übergänge.
       - title: KI nur dort, wo Regeln nicht reichen
         text: Das Modell beurteilt, ob eine Mail eine Anfrage ist, und zieht strukturiert Angaben heraus. Alles andere läuft deterministisch, und die Doku sagt offen, dass die KI sich irren kann.
       - title: Mails sind unordentlich
@@ -22,7 +22,7 @@ detail:
       - title: Jede Mail genau einmal
         text: Idempotenz und Dublettenschutz, damit keine Mail doppelt verarbeitet und kein Angebot doppelt erfasst wird.
       - title: Kontrolle für den Menschen
-        text: Ein Stopp-Link, klar benannte Info-Mails, ein Fehler-Workflow und ausdrückliche Grenzen. Die Automation löscht und verschiebt keine Mails, erstellt keine Angebote und beantwortet keine inhaltlichen Fragen. Im Kundenkontakt braucht sie Vertrauen.
+        text: Ein Stopp-Link, klar benannte Info-Mails, ein Fehler-Workflow und ausdrückliche Grenzen. Die Automation löscht und verschiebt keine Mails, erstellt keine Angebote und beantwortet keine inhaltlichen Fragen.
     stack:
       - n8n mit vier Workflows (Hauptprozess, Angebote erfassen, Angebot stoppen, Fehlerbehandlung)
       - IMAP zum Lesen und SMTP zum Senden
@@ -36,7 +36,7 @@ detail:
     motivation: A small business loses time and jobs when enquiries and quotes sit unanswered in a mailbox. The automation takes over that follow-up so the office can focus on the cases that need a human.
     learnings:
       - title: Processes as a state machine
-        text: Every case has a status, deadlines and clearly defined transitions. That is different from a linear flow.
+        text: Every case has a status, deadlines and clearly defined transitions.
       - title: AI only where rules fall short
         text: The model judges whether a mail is an enquiry and pulls out structured details. Everything else runs deterministically, and the documentation states openly that the AI can be wrong.
       - title: Email is messy
@@ -44,7 +44,7 @@ detail:
       - title: Every mail exactly once
         text: Idempotency and duplicate protection, so no mail is processed twice and no quote is recorded twice.
       - title: Control for the human
-        text: A stop link, clearly labelled info mails, an error workflow and explicit limits. The automation does not delete or move mails, create quotes or answer questions about content. In customer contact it has to earn trust.
+        text: A stop link, clearly labelled info mails, an error workflow and explicit limits. The automation does not delete or move mails, create quotes or answer questions about content.
     stack:
       - n8n with four workflows (main process, record quotes, stop quote, error handling)
       - IMAP for reading and SMTP for sending
