@@ -44,6 +44,14 @@ h2 { margin-top: var(--space-2xl); }
 .meta { color: var(--color-muted); font-size: var(--text-sm); }
 .prose img { max-width: 100%; }
 
+/* interests: topic page, text with room to breathe */
+.topic { margin-top: var(--space-xl); }
+.topic h1 { margin-bottom: var(--space-xl); }
+.topic p { max-width: 60ch; }
+.topic p + p { margin-top: var(--space-lg); }
+.topic p:not(.lead) { font-size: var(--text-lg); line-height: 1.7; }
+.topic .lead { line-height: 1.6; }
+
 /* interests: list of topics */
 .topics { margin-top: var(--space-xl); }
 .topics a { grid-template-columns: minmax(0, 1fr); }

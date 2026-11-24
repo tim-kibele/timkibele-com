@@ -19,6 +19,8 @@ const paragraphs = (item.data.text?.[lang] ?? tr.interests.note).split(/\n\s*\n/
 <Base lang={lang} title={title} description={tr.interests.intro} path={`interessen/${slug}/`}>
   {Animation && <Animation />}
   <p><a href={`/${lang}/interessen/`}>← {tr.back}</a></p>
-  <h1>{title}</h1>
-  {paragraphs.map((p, i) => <p class={i === 0 ? 'lead' : undefined}>{p}</p>)}
+  <section class="topic">
+    <h1>{title}</h1>
+    {paragraphs.map((p, i) => <p class={i === 0 ? 'lead' : undefined}>{p}</p>)}
+  </section>
 </Base>

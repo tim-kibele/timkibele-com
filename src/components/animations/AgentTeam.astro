@@ -1,15 +1,15 @@
 ---
-// Dekorative Animation für die KI-Seite: Ein Auftrag geht an einen Koordinator, der ihn auf drei
+// Dekorative Animation für die KI-Seite: Ein Mensch gibt einen Auftrag an einen Koordinator, der ihn auf drei
 // KI-Agenten verteilt. Ein Prüfer nimmt die Ergebnisse ab und schickt gelegentlich eines zurück.
 // Die Struktur ist festes SVG (sichtbar ohne JavaScript und bei "Bewegung reduzieren"),
 // das Skript lässt nur die Signale laufen.
 const S = 20; // halbe Kantenlänge eines Knotens
 const nodes = [
-  { id: 'A', x: 70, y: 60, icon: 'task' },
+  { id: 'A', x: 70, y: 60, icon: 'person' },
   { id: 'B', x: 70, y: 210, icon: 'split' },
-  { id: 'C1', x: 22, y: 360, icon: 'ai' },
-  { id: 'C2', x: 70, y: 360, icon: 'ai' },
-  { id: 'C3', x: 118, y: 360, icon: 'ai' },
+  { id: 'C1', x: 22, y: 360, icon: 'robot' },
+  { id: 'C2', x: 70, y: 360, icon: 'robot' },
+  { id: 'C3', x: 118, y: 360, icon: 'robot' },
   { id: 'D', x: 70, y: 510, icon: 'review' },
   { id: 'E', x: 70, y: 660, icon: 'done' },
 ];
@@ -21,9 +21,9 @@ const edges = links.map((key) => {
   return { key, d: `M${a.x} ${y1} C${a.x} ${ym} ${b.x} ${ym} ${b.x} ${y2}` };
 });
 const icons: Record<string, string> = {
-  task: '<rect x="-6" y="-8" width="12" height="16" rx="2"/><path d="M-3 -3 H3 M-3 1 H3 M-3 5 H0"/>',
+  person: '<path d="M-7 -3 H7 M-4 -3 V-7.5 H4 V-3"/><circle cx="0" cy="1" r="2.2"/><path d="M-6 8 V7 C-6 5.4 -3 4.8 0 4.8 C3 4.8 6 5.4 6 7 V8 M-2 5 L0 7 L2 5"/>',
   split: '<circle cx="0" cy="-5" r="2"/><circle cx="-6" cy="5" r="2"/><circle cx="6" cy="5" r="2"/><path d="M0 -3 V0 M0 0 L-6 3 M0 0 L6 3"/>',
-  ai: '<path d="M0 -8 L2 -2 L8 0 L2 2 L0 8 L-2 2 L-8 0 L-2 -2 Z"/>',
+  robot: '<path d="M-4 -4 H4 A2 2 0 0 1 6 -2 V3 A2 2 0 0 1 4 5 H-4 A2 2 0 0 1 -6 3 V-2 A2 2 0 0 1 -4 -4 Z M0 -4 V-6.5 M-8 -0.5 V2.5 M8 -0.5 V2.5 M-2.5 3 H2.5"/><circle class="dot" cx="0" cy="-7" r="1"/><circle class="dot" cx="-2.3" cy="0.5" r="1"/><circle class="dot" cx="2.3" cy="0.5" r="1"/>',
   review: '<circle cx="-2" cy="-2" r="5"/><path d="M2 2 L7 7"/>',
   done: '<path d="M-7 0 L-2 5 L7 -6"/>',
 };
