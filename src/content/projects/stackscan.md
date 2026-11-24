@@ -10,7 +10,7 @@ year: 2026
 detail:
   de:
     summary: Stackscan erkennt für jede Website in einer Liste das CMS, das serverseitige Framework, CRM- und Marketing-Tools und die Mail-Infrastruktur. Es braucht keine Browser-Automatisierung und schafft etwa 500 URLs in 3 bis 5 Minuten. Das Ergebnis ist eine CSV- oder Excel-Datei.
-    motivation: Platzhalter. Warum ich das Tool gebaut habe, folgt.
+    motivation: Ich wollte eine Liste von Websites schnell und ohne Handarbeit in eine Tabelle mit der dahinterliegenden Technik verwandeln, ohne Browser-Automatisierung und in wenigen Minuten.
     learnings:
       - title: Messen statt raten
         text: Die Standardwerte sind belegt. Über 25 parallelen Requests bricht der Durchsatz ein, Wiederholungen nach Timeouts brachten nichts (0 von 80), und der Tiefenmodus fand auf 200 Domains keinen zusätzlichen CRM-Treffer bei 187 Sekunden Mehrlaufzeit.
@@ -32,7 +32,7 @@ detail:
     note: Interne Anwendung, deshalb gibt es keinen öffentlichen Link.
   en:
     summary: For every website in a list, Stackscan detects the CMS, the server-side framework, CRM and marketing tools and the mail infrastructure. It needs no browser automation and handles about 500 URLs in 3 to 5 minutes. The result is a CSV or Excel file.
-    motivation: Placeholder. Why I built this tool is still to come.
+    motivation: I wanted to turn a list of websites into a table of the technology behind them quickly and without manual work, with no browser automation and in a few minutes.
     learnings:
       - title: Measure, don't guess
         text: The defaults are backed by data. Above 25 parallel requests the throughput collapses, retries after timeouts did not help (0 of 80), and deep mode found no extra CRM hits on 200 domains for 187 seconds of extra runtime.
