@@ -9,7 +9,7 @@ tags: [n8n, LLM, IMAP/SMTP, JavaScript]
 year: 2026
 detail:
   de:
-    summary: Eine Automation für das zentrale Info-Postfach eines kleinen Handwerksbetriebs. Sie erkennt Kundenanfragen, fragt fehlende Angaben wie Foto und Adresse selbstständig nach und behält verschickte Angebote im Blick, damit rechtzeitig nachgefasst wird. Alles, was einen Menschen braucht, landet als kurze Info-Mail mit klarem Betreff-Tag im Büro-Postfach.
+    summary: Eine Automation für das zentrale Postfach eines kleinen Handwerksbetriebs. Sie erkennt Kundenanfragen, fragt fehlende Angaben wie Foto und Adresse selbstständig nach und behält verschickte Angebote im Blick, damit rechtzeitig nachgefasst wird.
     motivation: Platzhalter. Warum ich das Projekt gebaut habe, folgt.
     learnings:
       - title: Prozesse als Zustandsautomat
@@ -28,10 +28,10 @@ detail:
       - Sprachmodell von OpenAI über den Information-Extractor-Node
       - n8n Data Tables als leichte Datenbank für Vorgänge und Angebote
       - JavaScript in Code-Nodes
-      - Webhooks für den Stopp-Link
+      - Webhooks zum Stoppen einer Nachfrage
     note: Kundenprojekt, anonymisiert. Es gibt keinen öffentlichen Link.
   en:
-    summary: An automation for the central info mailbox of a small trades business. It recognises customer enquiries, asks for missing details such as a photo and an address on its own, and keeps track of sent quotes so they get followed up in time. Anything that needs a human lands in the office mailbox as a short info mail with a clear subject tag.
+    summary: An automation for the central mailbox of a small trades business. It recognises customer enquiries, asks for missing details such as a photo and an address on its own, and keeps track of sent quotes so they get followed up in time.
     motivation: Placeholder. Why I built this project is still to come.
     learnings:
       - title: Processes as a state machine
@@ -50,6 +50,6 @@ detail:
       - OpenAI language model via the Information Extractor node
       - n8n Data Tables as a lightweight database for cases and quotes
       - JavaScript in Code nodes
-      - Webhooks for the stop link
+      - Webhooks to stop a follow-up
     note: Client project, anonymised. There is no public link.
 ---
