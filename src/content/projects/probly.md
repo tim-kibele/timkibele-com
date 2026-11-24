@@ -8,6 +8,7 @@ description:
 repo: https://github.com/pwhofman/probly
 tags: [Python, PyTorch, pytest, Open Source]
 year: 2025
+animation: neural-net
 detail:
   de:
     summary: probly ist eine Open-Source-Bibliothek in Python, mit der sich Unsicherheit in Machine-Learning-Modellen darstellen und quantifizieren lässt. Im Softwareentwicklungspraktikum an der LMU (Wintersemester 2025/26) habe ich Tests für DropConnect und Ensembles geschrieben und Tutorial-Notebooks zu Masksembles und zu Scikit-Learn-Ensembles erstellt.

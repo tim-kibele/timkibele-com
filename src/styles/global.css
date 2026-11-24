@@ -60,14 +60,50 @@ h2 { margin-top: var(--space-2xl); }
 .cv-row .org { font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-2xs); }
 @media (max-width: 40rem) { .cv-row { grid-template-columns: minmax(0, 1fr); gap: var(--space-2xs); } }
 
-/* neural net (probly page only) */
-.neural-net { display: none; }
-@media (min-width: 85rem) {
-  .neural-net { display: block; position: fixed; top: 0; right: var(--space-lg); width: 7rem; height: 100vh; pointer-events: none; }
+/* margin art: small decorative animation at the right edge of a project page, anchored to the top of the page so it scrolls away with it (hidden on narrow screens) */
+.margin-art { display: none; }
+@media (min-width: 77rem) {
+  .margin-art { display: block; position: absolute; top: 0; right: var(--space-lg); width: clamp(7.5rem, calc((100% - 56rem) / 2 - 2.5rem), 8.25rem); height: 100vh; pointer-events: none; }
 }
-.neural-net .edge { stroke: var(--color-rule); stroke-width: 0.6; stroke-opacity: 0.8; transition: stroke var(--dur-long) var(--ease-out), stroke-opacity var(--dur-long) var(--ease-out); }
+
+/* animation: scan (Stackscan page) */
+.scan text { font-family: var(--font-body); font-size: 11px; fill: var(--color-muted); }
+.scan .count { font-size: 10px; font-variant-numeric: lining-nums tabular-nums; }
+.scan .domain { font-size: 12.5px; fill: var(--color-ink); }
+.scan .sig .track { fill: var(--tint-moss); }
+.scan .sig .fill { fill: var(--color-accent); transform-box: fill-box; transform-origin: left center; transform: scaleX(0); }
+.scan .sig.scanning .fill { transform: scaleX(1); transition: transform var(--dur-long) linear; }
+.scan .sig.done .fill { transform: scaleX(1); }
+.scan .sig .check, .scan .sig .dash { fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity var(--dur-short) var(--ease-out); }
+.scan .sig .check { stroke: var(--color-accent); }
+.scan .sig .dash { stroke: var(--color-muted); }
+.scan .sig.done .dash { opacity: 1; }
+.scan .sig.done.hit .dash { opacity: 0; }
+.scan .sig.done.hit .check { opacity: 1; }
+.scan .sig.done.hit text { fill: var(--color-ink); }
+.scan .badge { opacity: 0; transition: opacity var(--dur-long) var(--ease-out); }
+.scan .badge.show { opacity: 1; }
+.scan .badge rect { fill: var(--tint-moss); stroke: var(--color-accent); stroke-width: 1; }
+.scan .badge text { fill: var(--color-ink); font-size: 14px; font-weight: 500; }
+.scan .divider { stroke: var(--color-rule); stroke-width: 1; }
+.scan .hist .ht { fill: var(--color-ink); font-weight: 500; }
+.scan .hist.new .hd, .scan .hist.new .ht { fill: var(--color-accent); }
+
+/* animation: workflow (email automation page) */
+.workflow .edge { fill: none; stroke: var(--color-rule-2); stroke-width: 1.2; transition: stroke var(--dur-long) var(--ease-out); }
+.workflow .edge.on { stroke: var(--color-accent); }
+.workflow .wf-node { color: var(--color-muted); transition: color var(--dur-long) var(--ease-out); }
+.workflow .wf-node rect { fill: var(--color-paper); stroke: var(--color-rule-2); stroke-width: 1; transition: stroke var(--dur-long) var(--ease-out); }
+.workflow .wf-node .wf-icon { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.workflow .wf-node .wf-icon .dot { fill: currentColor; }
+.workflow .wf-node.on { color: var(--color-accent); }
+.workflow .wf-node.on rect { stroke: var(--color-accent); }
+.workflow .pulse { fill: var(--color-accent); }
+
+/* animation: neural net */
+.neural-net .edge { stroke: var(--color-rule); stroke-width: 0.8; stroke-opacity: 0.8; transition: stroke var(--dur-long) var(--ease-out), stroke-opacity var(--dur-long) var(--ease-out); }
 .neural-net .edge.on { stroke: var(--color-accent); stroke-opacity: 1; }
-.neural-net .node { fill: var(--color-paper); stroke: var(--color-rule-2); stroke-width: 1; transition: fill var(--dur-long) var(--ease-out); }
+.neural-net .node { fill: var(--color-paper); stroke: var(--color-rule-2); stroke-width: 1.2; transition: fill var(--dur-long) var(--ease-out); }
 .neural-net .node.on { fill: var(--color-accent); }
 .neural-net .pulse { fill: var(--color-accent); }
 

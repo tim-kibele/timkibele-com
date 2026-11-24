@@ -7,6 +7,7 @@ description:
   en: Reads an info mailbox, asks for missing details and follows up on quotes.
 tags: [n8n, LLM, IMAP/SMTP, JavaScript]
 year: 2026
+animation: workflow
 detail:
   de:
     summary: Eine Automation für das zentrale Postfach eines kleinen Handwerksbetriebs. Sie erkennt Kundenanfragen, fragt fehlende Angaben wie Foto und Adresse selbstständig nach und behält verschickte Angebote im Blick, damit rechtzeitig nachgefasst wird.

@@ -7,6 +7,7 @@ description:
   en: Finds out which technology runs behind a list of websites.
 tags: [Python, asyncio, httpx, Tkinter]
 year: 2026
+animation: scan
 detail:
   de:
     summary: Stackscan erkennt für jede Website in einer Liste das CMS, das serverseitige Framework, CRM- und Marketing-Tools und die Mail-Infrastruktur. Es braucht keine Browser-Automatisierung und schafft etwa 500 URLs in 3 bis 5 Minuten. Das Ergebnis ist eine CSV- oder Excel-Datei.

@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
-import NeuralNet from '../../../components/NeuralNet.astro';
+import { animations } from '../../../components/animations';
 import { languages, t, type Lang } from '../../../i18n/ui';
 
 export async function getStaticPaths() {
@@ -13,9 +13,10 @@ const slug = Astro.params.slug!;
 const { project } = Astro.props;
 const tr = t(lang);
 const d = project.data.detail![lang];
+const Animation = project.data.animation ? animations[project.data.animation] : null;
 ---
 <Base lang={lang} title={project.data.title[lang]} description={project.data.description[lang]} path={`projekte/${slug}/`}>
-  {slug === 'probly' && <NeuralNet />}
+  {Animation && <Animation />}
   <p><a href={`/${lang}/projekte/`}>← {tr.back}</a></p>
   <h1>{project.data.title[lang]}</h1>
   <p class="lead">{d.summary}</p>

@@ -2,7 +2,7 @@
 // Dekoratives neuronales Netz am rechten Rand. Die Struktur ist festes HTML (sichtbar auch ohne JavaScript
 // und bei "Bewegung reduzieren"), das Skript lässt nur Impulse durchlaufen.
 const sizes = [3, 4, 5, 5, 5, 5, 4, 3];
-const W = 120, H = 1000, padX = 16, padY = 70;
+const W = 140, H = 780, padX = 22, padY = 50;
 const nodes = sizes.flatMap((n, l) =>
   Array.from({ length: n }, (_, j) => ({
     key: `${l},${j}`,
@@ -17,12 +17,12 @@ const edges = sizes.slice(0, -1).flatMap((n, l) =>
   ).flat(),
 );
 ---
-<svg class="neural-net" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" data-sizes={JSON.stringify(sizes)}>
+<svg class="margin-art neural-net" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" data-sizes={JSON.stringify(sizes)}>
   <g>
     {edges.map((e) => <line class="edge" data-e={e.key} x1={e.from.cx} y1={e.from.cy} x2={e.to.cx} y2={e.to.cy} />)}
   </g>
   <g>
-    {nodes.map((n) => <circle class="node" data-n={n.key} cx={n.cx} cy={n.cy} r="3.4" />)}
+    {nodes.map((n) => <circle class="node" data-n={n.key} cx={n.cx} cy={n.cy} r="4" />)}
   </g>
   <g class="pulses"></g>
 </svg>
@@ -55,7 +55,7 @@ const edges = sizes.slice(0, -1).flatMap((n, l) =>
     const spawn = (now: number) => {
       const path = sizes.map((n) => Math.floor(Math.random() * n));
       const el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      el.setAttribute('r', '2.6');
+      el.setAttribute('r', '3.2');
       el.setAttribute('class', 'pulse');
       layer.appendChild(el);
       active.push({ path, start: now, el, seg: -1 });

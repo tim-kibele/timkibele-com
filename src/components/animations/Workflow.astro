@@ -1,0 +1,131 @@
+---
+// Dekorativer n8n-artiger Workflow am rechten Rand, angelehnt an die E-Mail-Automation:
+// Mail-Eingang, IF, KI-Prüfung, Rückfrage, Datenbank, Wartezeit, Info ans Büro.
+// Die Struktur ist festes SVG (sichtbar ohne JavaScript und bei "Bewegung reduzieren"),
+// das Skript lässt nur Durchläufe nacheinander durch zufällige Zweige laufen.
+const S = 20; // halbe Kantenlänge eines Knotens
+const nodes = [
+  { id: 'A', x: 70, y: 60, icon: 'mail' },
+  { id: 'B', x: 70, y: 170, icon: 'if' },
+  { id: 'C', x: 70, y: 280, icon: 'ai' },
+  { id: 'D', x: 116, y: 280, icon: 'bell' },
+  { id: 'E', x: 70, y: 390, icon: 'if' },
+  { id: 'F', x: 24, y: 500, icon: 'send' },
+  { id: 'G', x: 116, y: 500, icon: 'db' },
+  { id: 'H', x: 24, y: 610, icon: 'clock' },
+  { id: 'I', x: 70, y: 720, icon: 'bell' },
+];
+const links = ['A-B', 'B-C', 'B-D', 'C-E', 'E-F', 'E-G', 'F-H', 'H-I', 'G-I'];
+const by = Object.fromEntries(nodes.map((n) => [n.id, n]));
+const edges = links.map((key) => {
+  const [a, b] = key.split('-').map((id) => by[id]);
+  const y1 = a.y + S, y2 = b.y - S, ym = (y1 + y2) / 2;
+  return { key, d: `M${a.x} ${y1} C${a.x} ${ym} ${b.x} ${ym} ${b.x} ${y2}` };
+});
+const icons: Record<string, string> = {
+  mail: '<rect x="-8" y="-6" width="16" height="12" rx="2"/><path d="M-8 -4 L0 2 L8 -4"/>',
+  if: '<path d="M-7 0 H-2 M-2 0 L6 -6 M-2 0 L6 6"/><circle class="dot" cx="7" cy="-6" r="1.4"/><circle class="dot" cx="7" cy="6" r="1.4"/>',
+  ai: '<path d="M0 -8 L2 -2 L8 0 L2 2 L0 8 L-2 2 L-8 0 L-2 -2 Z"/>',
+  bell: '<path d="M-5 3 L-4 -1 V-3 A4 4 0 0 1 4 -3 V-1 L5 3 Z M-2 6 H2"/>',
+  send: '<path d="M-8 -1 L8 -7 L2 8 L-1 2 Z M-1 2 L8 -7"/>',
+  db: '<ellipse cx="0" cy="-5" rx="6" ry="2.5"/><path d="M-6 -5 V5 C-6 7.5 6 7.5 6 5 V-5 M-6 0 C-6 2.5 6 2.5 6 0"/>',
+  clock: '<circle cx="0" cy="0" r="7"/><path d="M0 -4 V0 L3 2"/>',
+};
+---
+<svg class="margin-art workflow" viewBox="0 0 140 780" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+  <g>
+    {edges.map((e) => <path class="edge" data-e={e.key} d={e.d} />)}
+  </g>
+  <g>
+    {nodes.map((n) => (
+      <g class="wf-node" data-n={n.id} transform={`translate(${n.x} ${n.y})`}>
+        <rect x={-S} y={-S} width={S * 2} height={S * 2} rx="8" />
+        <g class="wf-icon" transform="scale(1.2)" set:html={icons[n.icon]} />
+      </g>
+    ))}
+  </g>
+  <g class="pulses"></g>
+</svg>
+
+<script>
+  const svg = document.querySelector<SVGSVGElement>('.workflow');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  if (svg && !reduce.matches) {
+    const nodeEl: Record<string, Element> = {};
+    const edgeEl: Record<string, SVGPathElement> = {};
+    svg.querySelectorAll('[data-n]').forEach((n) => (nodeEl[(n as SVGElement).dataset.n!] = n));
+    svg.querySelectorAll<SVGPathElement>('[data-e]').forEach((e) => (edgeEl[e.dataset.e!] = e));
+    const layer = svg.querySelector('.pulses')!;
+
+    const flash = (el: Element) => {
+      el.classList.add('on');
+      setTimeout(() => el.classList.remove('on'), 1100);
+    };
+    // Ein Durchlauf: zufällige Zweige an den beiden IF-Knoten.
+    const plan = (): string[] => {
+      const path = ['A', 'B'];
+      if (Math.random() < 0.7) {
+        path.push('C', 'E');
+        if (Math.random() < 0.5) path.push('F', 'H', 'I');
+        else path.push('G', 'I');
+      } else {
+        path.push('D');
+      }
+      return path;
+    };
+
+    let run: { path: string[]; i: number; start: number; el: SVGCircleElement } | null = null;
+    let nextRun = 0;
+    let raf = 0;
+
+    const frame = (now: number) => {
+      if (!run) {
+        if (now >= nextRun && svg.getBoundingClientRect().width > 0) {
+          const el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          el.setAttribute('r', '3.6');
+          el.setAttribute('class', 'pulse');
+          layer.appendChild(el);
+          run = { path: plan(), i: -1, start: now, el };
+        }
+      } else {
+        const { path } = run;
+        if (run.i < 0) {
+          flash(nodeEl[path[0]]);
+          run.i = 0;
+          run.start = now;
+          flash(edgeEl[`${path[0]}-${path[1]}`]);
+        }
+        const edge = edgeEl[`${path[run.i]}-${path[run.i + 1]}`];
+        const len = edge.getTotalLength();
+        const dur = Math.min(1100, Math.max(450, len / 0.18));
+        const t = (now - run.start) / dur;
+        if (t >= 1) {
+          flash(nodeEl[path[run.i + 1]]);
+          run.i += 1;
+          run.start = now;
+          if (run.i >= path.length - 1) {
+            run.el.remove();
+            run = null;
+            nextRun = now + 500 + Math.random() * 900;
+          } else {
+            flash(edgeEl[`${path[run.i]}-${path[run.i + 1]}`]);
+          }
+        } else {
+          const p = edge.getPointAtLength(t * len);
+          run.el.setAttribute('transform', `translate(${p.x} ${p.y})`);
+        }
+      }
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    reduce.addEventListener('change', () => {
+      if (reduce.matches) {
+        cancelAnimationFrame(raf);
+        run?.el.remove();
+        run = null;
+      } else {
+        raf = requestAnimationFrame(frame);
+      }
+    });
+  }
+</script>
