@@ -4,6 +4,15 @@ import { z } from 'astro/zod';
 
 const text = z.object({ de: z.string(), en: z.string() });
 
+// Gleiche Struktur für jede Projektseite, je Sprache.
+const detail = z.object({
+  summary: z.string(),
+  motivation: z.string(),
+  learnings: z.array(z.object({ title: z.string(), text: z.string() })),
+  stack: z.array(z.string()),
+  note: z.string().optional(),
+});
+
 const projects = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
   schema: z.object({
@@ -13,6 +22,7 @@ const projects = defineCollection({
     repo: z.string().url().optional(),
     tags: z.array(z.string()).default([]),
     year: z.number(),
+    detail: z.object({ de: detail, en: detail }).optional(),
     featured: z.boolean().default(false),
   }),
 });

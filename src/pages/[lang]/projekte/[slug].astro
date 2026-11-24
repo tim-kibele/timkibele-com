@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import { languages, t, type Lang } from '../../../i18n/ui';
+
+export async function getStaticPaths() {
+  const projects = (await getCollection('projects')).filter((p) => p.data.detail);
+  return languages.flatMap((lang) => projects.map((project) => ({ params: { lang, slug: project.id }, props: { project } })));
+}
+const lang = Astro.params.lang as Lang;
+const slug = Astro.params.slug!;
+const { project } = Astro.props;
+const tr = t(lang);
+const d = project.data.detail![lang];
+---
+<Base lang={lang} title={project.data.title[lang]} description={project.data.description[lang]} path={`projekte/${slug}/`}>
+  <p><a href={`/${lang}/projekte/`}>← {tr.back}</a></p>
+  <h1>{project.data.title[lang]}</h1>
+  <p class="lead">{d.summary}</p>
+
+  <section class="detail">
+    <h2>{tr.projects.motivation}</h2>
+    <p>{d.motivation}</p>
+
+    <h2>{tr.projects.learnings}</h2>
+    <ul class="learnings">
+      {d.learnings.map((l) => <li><strong>{l.title}.</strong> {l.text}</li>)}
+    </ul>
+
+    <h2>{tr.projects.stack}</h2>
+    <ul class="stack">{d.stack.map((s) => <li>{s}</li>)}</ul>
+
+    {d.note && <p class="meta">{d.note}</p>}
+
+    <!-- Easter-Egg-Platzhalter: bewusst unsichtbar, bis es etwas gibt -->
+    <div data-easter={slug} hidden></div>
+  </section>
+</Base>

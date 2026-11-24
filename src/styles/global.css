@@ -44,6 +44,13 @@ h2 { margin-top: var(--space-2xl); }
 .meta { color: var(--color-muted); font-size: var(--text-sm); }
 .prose img { max-width: 100%; }
 
+/* project detail */
+.detail h2 { font-size: var(--text-xl); margin-top: var(--space-xl); }
+.detail ul { margin: var(--space-sm) 0 0; padding-left: 1.2em; max-width: 65ch; }
+.detail li + li { margin-top: var(--space-sm); }
+.detail strong { font-weight: 500; color: var(--color-ink); }
+.detail .meta { margin-top: var(--space-xl); }
+
 /* controls */
 .btn { display: inline-block; border-radius: var(--radius-pill); border: var(--rule-hair) solid var(--color-rule-2); padding: var(--space-sm) var(--space-lg); font-weight: 500; text-decoration: none; color: var(--color-ink); transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out); }
 .btn:hover { background: var(--tint-moss); }
