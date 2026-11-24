@@ -60,6 +60,17 @@ h2 { margin-top: var(--space-2xl); }
 .cv-row .org { font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-2xs); }
 @media (max-width: 40rem) { .cv-row { grid-template-columns: minmax(0, 1fr); gap: var(--space-2xs); } }
 
+/* neural net (probly page only) */
+.neural-net { display: none; }
+@media (min-width: 85rem) {
+  .neural-net { display: block; position: fixed; top: 0; right: var(--space-lg); width: 7rem; height: 100vh; pointer-events: none; }
+}
+.neural-net .edge { stroke: var(--color-rule); stroke-width: 0.6; stroke-opacity: 0.8; transition: stroke var(--dur-long) var(--ease-out), stroke-opacity var(--dur-long) var(--ease-out); }
+.neural-net .edge.on { stroke: var(--color-accent); stroke-opacity: 1; }
+.neural-net .node { fill: var(--color-paper); stroke: var(--color-rule-2); stroke-width: 1; transition: fill var(--dur-long) var(--ease-out); }
+.neural-net .node.on { fill: var(--color-accent); }
+.neural-net .pulse { fill: var(--color-accent); }
+
 /* controls */
 .btn { display: inline-block; border-radius: var(--radius-pill); border: var(--rule-hair) solid var(--color-rule-2); padding: var(--space-sm) var(--space-lg); font-weight: 500; text-decoration: none; color: var(--color-ink); transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out); }
 .btn:hover { background: var(--tint-moss); }

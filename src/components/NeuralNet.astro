@@ -1,0 +1,100 @@
+---
+// Dekoratives neuronales Netz am rechten Rand. Die Struktur ist festes HTML (sichtbar auch ohne JavaScript
+// und bei "Bewegung reduzieren"), das Skript lässt nur Impulse durchlaufen.
+const sizes = [3, 4, 5, 5, 5, 5, 4, 3];
+const W = 120, H = 1000, padX = 16, padY = 70;
+const nodes = sizes.flatMap((n, l) =>
+  Array.from({ length: n }, (_, j) => ({
+    key: `${l},${j}`,
+    cx: n === 1 ? W / 2 : padX + (j * (W - 2 * padX)) / (n - 1),
+    cy: padY + (l * (H - 2 * padY)) / (sizes.length - 1),
+  })),
+);
+const at = (l: number, j: number) => nodes.find((n) => n.key === `${l},${j}`)!;
+const edges = sizes.slice(0, -1).flatMap((n, l) =>
+  Array.from({ length: n }, (_, a) =>
+    Array.from({ length: sizes[l + 1] }, (_, b) => ({ key: `${l},${a},${b}`, from: at(l, a), to: at(l + 1, b) })),
+  ).flat(),
+);
+---
+<svg class="neural-net" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" data-sizes={JSON.stringify(sizes)}>
+  <g>
+    {edges.map((e) => <line class="edge" data-e={e.key} x1={e.from.cx} y1={e.from.cy} x2={e.to.cx} y2={e.to.cy} />)}
+  </g>
+  <g>
+    {nodes.map((n) => <circle class="node" data-n={n.key} cx={n.cx} cy={n.cy} r="3.4" />)}
+  </g>
+  <g class="pulses"></g>
+</svg>
+
+<script>
+  const svg = document.querySelector<SVGSVGElement>('.neural-net');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  if (svg && !reduce.matches) {
+    const sizes: number[] = JSON.parse(svg.dataset.sizes!);
+    const pos: Record<string, [number, number]> = {};
+    const nodeEl: Record<string, Element> = {};
+    const edgeEl: Record<string, Element> = {};
+    svg.querySelectorAll('[data-n]').forEach((n) => {
+      const k = (n as SVGElement).dataset.n!;
+      pos[k] = [parseFloat(n.getAttribute('cx')!), parseFloat(n.getAttribute('cy')!)];
+      nodeEl[k] = n;
+    });
+    svg.querySelectorAll('[data-e]').forEach((e) => (edgeEl[(e as SVGElement).dataset.e!] = e));
+    const layer = svg.querySelector('.pulses')!;
+    const SEG = 750;
+    const MAX = 9;
+    type Pulse = { path: number[]; start: number; el: SVGCircleElement; seg: number };
+    let active: Pulse[] = [];
+    let nextSpawn = 0;
+
+    const flash = (el: Element) => {
+      el.classList.add('on');
+      setTimeout(() => el.classList.remove('on'), 900);
+    };
+    const spawn = (now: number) => {
+      const path = sizes.map((n) => Math.floor(Math.random() * n));
+      const el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      el.setAttribute('r', '2.6');
+      el.setAttribute('class', 'pulse');
+      layer.appendChild(el);
+      active.push({ path, start: now, el, seg: -1 });
+    };
+    const frame = (now: number) => {
+      if (now >= nextSpawn) {
+        if (active.length < MAX && svg.getBoundingClientRect().width > 0) spawn(now);
+        nextSpawn = now + 350 + Math.random() * 650;
+      }
+      active = active.filter((p) => {
+        const last = p.path.length - 1;
+        const seg = Math.floor((now - p.start) / SEG);
+        if (seg >= last) {
+          flash(nodeEl[`${last},${p.path[last]}`]);
+          p.el.remove();
+          return false;
+        }
+        if (seg !== p.seg) {
+          p.seg = seg;
+          flash(nodeEl[`${seg},${p.path[seg]}`]);
+          flash(edgeEl[`${seg},${p.path[seg]},${p.path[seg + 1]}`]);
+        }
+        const t = ((now - p.start) % SEG) / SEG;
+        const [x1, y1] = pos[`${seg},${p.path[seg]}`];
+        const [x2, y2] = pos[`${seg + 1},${p.path[seg + 1]}`];
+        p.el.setAttribute('transform', `translate(${x1 + (x2 - x1) * t} ${y1 + (y2 - y1) * t})`);
+        return true;
+      });
+      raf = requestAnimationFrame(frame);
+    };
+    let raf = requestAnimationFrame(frame);
+    reduce.addEventListener('change', () => {
+      if (reduce.matches) {
+        cancelAnimationFrame(raf);
+        active.forEach((p) => p.el.remove());
+        active = [];
+      } else {
+        raf = requestAnimationFrame(frame);
+      }
+    });
+  }
+</script>
