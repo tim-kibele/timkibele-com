@@ -23,7 +23,7 @@ detail:
       - title: Grenzen von HTTP-Scanning
         text: Bot-Schutz prüft TLS-Fingerprint und JavaScript, nachgeladene Inhalte fehlen im HTML. Eine leere Spalte heißt oft wirklich „kein CMS“.
     stack:
-      - Python (ab 3.9, entwickelt mit 3.13)
+      - Python
       - asyncio und httpx für nebenläufige Requests
       - dnspython für SPF- und DNS-Abfragen
       - openpyxl für die Excel-Ausgabe
@@ -45,7 +45,7 @@ detail:
       - title: Limits of HTTP scanning
         text: Bot protection checks the TLS fingerprint and JavaScript, and content loaded later is missing from the HTML. An empty column often really means "no CMS".
     stack:
-      - Python (3.9+, developed with 3.13)
+      - Python
       - asyncio and httpx for concurrent requests
       - dnspython for SPF and DNS lookups
       - openpyxl for the Excel output
