@@ -1,0 +1,20 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import { languages, t, type Lang } from '../../../i18n/ui';
+
+export async function getStaticPaths() {
+  const items = await getCollection('interests');
+  return languages.flatMap((lang) => items.map((item) => ({ params: { lang, slug: item.id }, props: { item } })));
+}
+const lang = Astro.params.lang as Lang;
+const slug = Astro.params.slug!;
+const { item } = Astro.props;
+const tr = t(lang);
+const title = item.data.title[lang];
+---
+<Base lang={lang} title={title} description={tr.interests.intro} path={`interessen/${slug}/`}>
+  <p><a href={`/${lang}/interessen/`}>← {tr.back}</a></p>
+  <h1>{title}</h1>
+  <p class="lead">{item.data.text?.[lang] ?? tr.interests.note}</p>
+</Base>

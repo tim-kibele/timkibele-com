@@ -18,9 +18,8 @@ export const ui = {
     projects: { title: 'Projekte', intro: 'Meine Projekte. Hier findest du die Übersicht.', open: 'Öffnen', code: 'Code', motivation: 'Motivation', learnings: 'Learnings', stack: 'Stack' },
     interests: {
       title: 'Interessen',
-      intro: 'Wofür ich mich interessiere: KI, Gaming und mechanische Tastaturen.',
+      intro: 'Wofür ich mich interessiere und was mir wichtig ist.',
       note: 'Text folgt.',
-      items: ['KI', 'Gaming', 'Mechanische Tastaturen'],
     },
     cv: { title: 'Lebenslauf' },
     legal: { title: 'Datenschutz' },
@@ -44,9 +43,8 @@ export const ui = {
     projects: { title: 'Projects', intro: 'My projects. Here you will find the overview.', open: 'Open', code: 'Code', motivation: 'Motivation', learnings: 'Learnings', stack: 'Stack' },
     interests: {
       title: 'Interests',
-      intro: 'What I am into: AI, gaming and mechanical keyboards.',
+      intro: 'What I am into and what matters to me.',
       note: 'Text to come.',
-      items: ['AI', 'Gaming', 'Mechanical keyboards'],
     },
     cv: { title: 'CV' },
     legal: { title: 'Privacy policy' },

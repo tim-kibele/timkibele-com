@@ -29,4 +29,14 @@ const projects = defineCollection({
   }),
 });
 
-export const collections = { projects };
+// Interessen: eine Datei pro Unterseite. `text` (optional, je Sprache) ersetzt den Platzhalter.
+const interests = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/interests' }),
+  schema: z.object({
+    title: text,
+    order: z.number(),
+    text: text.optional(),
+  }),
+});
+
+export const collections = { projects, interests };

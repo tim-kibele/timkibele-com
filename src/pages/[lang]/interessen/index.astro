@@ -1,4 +1,5 @@
 ---
+import { getCollection } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
 import { languages, t, type Lang } from '../../../i18n/ui';
 
@@ -7,17 +8,15 @@ export function getStaticPaths() {
 }
 const lang = Astro.params.lang as Lang;
 const tr = t(lang);
+const items = (await getCollection('interests')).sort((a, b) => a.data.order - b.data.order);
 ---
 <Base lang={lang} title={tr.interests.title} description={tr.interests.intro} path="interessen/">
   <h1>{tr.interests.title}</h1>
   <p class="lead">{tr.interests.intro}</p>
 
-  <div class="detail">
-    {tr.interests.items.map((item) => (
-      <section>
-        <h2>{item}</h2>
-        <p>{tr.interests.note}</p>
-      </section>
+  <ul class="index topics">
+    {items.map((i) => (
+      <li><a href={`/${lang}/interessen/${i.id}/`}><span class="name">{i.data.title[lang]}</span></a></li>
     ))}
-  </div>
+  </ul>
 </Base>
