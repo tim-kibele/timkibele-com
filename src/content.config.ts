@@ -29,12 +29,12 @@ const projects = defineCollection({
   }),
 });
 
-// Interessen: eine Datei pro Unterseite. `text` (optional, je Sprache) ersetzt den Platzhalter.
+// Interessen: eine Datei pro Unterseite, auf der Übersicht alphabetisch nach Titel sortiert.
+// `text` (optional, je Sprache) ersetzt den Platzhalter.
 const interests = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/interests' }),
   schema: z.object({
     title: text,
-    order: z.number(),
     text: text.optional(),
   }),
 });
