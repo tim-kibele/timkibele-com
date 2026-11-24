@@ -1,0 +1,71 @@
+---
+import '../styles/global.css';
+import { t, other, type Lang } from '../i18n/ui';
+
+interface Props { lang: Lang; title?: string; description?: string; path: string }
+const { lang, title, description, path } = Astro.props;
+const tr = t(lang);
+const pageTitle = title ? `${title} · ${tr.siteTitle}` : tr.siteTitle;
+const desc = description ?? tr.tagline;
+const site = Astro.site!.origin;
+const href = (p: string) => `/${lang}/${p}`;
+const nav = [
+  ['', tr.nav.home],
+  ['projekte/', tr.nav.projects],
+  ['berichte/', tr.nav.reports],
+  ['lebenslauf/', tr.nav.cv],
+] as const;
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={desc} />
+    <script is:inline>try { var th = localStorage.getItem('theme'); if (th) document.documentElement.dataset.theme = th; } catch (e) {}</script>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={`${site}/${lang}/${path}`} />
+    <link rel="alternate" hreflang="de" href={`${site}/de/${path}`} />
+    <link rel="alternate" hreflang="en" href={`${site}/en/${path}`} />
+  </head>
+  <body>
+    <header class="site">
+      <div class="wrap">
+        <a class="brand" href={href('')}>{tr.siteTitle}</a>
+        <nav>
+          {nav.map(([p, label]) => (
+            <a href={href(p)} aria-current={Astro.url.pathname === href(p) ? 'page' : undefined}>{label}</a>
+          ))}
+          <a href={`/${other(lang)}/${path}`} hreflang={other(lang)}>{tr.switchTo}</a>
+          <button type="button" class="theme-toggle" data-dark={tr.theme.dark} data-light={tr.theme.light} hidden>
+            <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" /></svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6" /></svg>
+          </button>
+        </nav>
+      </div>
+    </header>
+    <main class="wrap"><slot /></main>
+    <footer class="site">
+      <div class="wrap">
+        © {new Date().getFullYear()} Tim Kibele · <a href={href('datenschutz/')}>{tr.nav.legal}</a>
+      </div>
+    </footer>
+    <script is:inline>
+      (function () {
+        var b = document.querySelector('.theme-toggle'), r = document.documentElement;
+        var mq = matchMedia('(prefers-color-scheme: dark)');
+        function cur() { return r.dataset.theme || (mq.matches ? 'dark' : 'light'); }
+        function label() { var d = cur() === 'dark'; b.dataset.mode = d ? 'dark' : 'light'; b.setAttribute('aria-label', d ? b.dataset.light : b.dataset.dark); b.title = b.getAttribute('aria-label'); }
+        b.hidden = false; label();
+        b.addEventListener('click', function () {
+          var n = cur() === 'dark' ? 'light' : 'dark';
+          r.dataset.theme = n;
+          try { localStorage.setItem('theme', n); } catch (e) {}
+          label();
+        });
+        mq.addEventListener('change', label);
+      })();
+    </script>
+  </body>
+</html>

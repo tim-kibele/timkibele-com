@@ -1,0 +1,46 @@
+---
+import Base from '../../layouts/Base.astro';
+import { languages, t, type Lang } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return languages.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+const tr = t(lang);
+const rows = [
+  { href: `/${lang}/projekte/`, name: tr.nav.projects, note: tr.projects.intro },
+  { href: `/${lang}/berichte/`, name: tr.nav.reports, note: tr.reports.intro },
+  { href: `/${lang}/lebenslauf/`, name: tr.nav.cv, note: tr.home.cvNote },
+];
+---
+<Base lang={lang} path="">
+  <section class="about">
+    <div>
+      <h1>{tr.home.heading}</h1>
+      <p class="lead">{tr.home.intro}</p>
+      <div class="actions">
+        <a class="btn btn--primary" href={`/${lang}/lebenslauf/`}>{tr.nav.cv}</a>
+        <a class="btn" href={`/${lang}/projekte/`}>{tr.nav.projects}</a>
+      </div>
+    </div>
+    <figure class="portrait">
+      <div data-slot="portrait" data-alt={tr.siteTitle}><span>{tr.home.portrait}</span></div>
+    </figure>
+  </section>
+
+  <section class="more">
+    <h2>{tr.home.more}</h2>
+    <ul class="index">
+      {rows.map((r) => (
+        <li><a href={r.href}><span class="name">{r.name}</span><span class="note">{r.note}</span></a></li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="closing">
+    <h2>{tr.home.closing}</h2>
+    <p>{tr.home.closingNote}</p>
+  </section>
+  <script is:inline>window.hallmarkSlots = (m) => { for (const [k, v] of Object.entries(m)) { const s = document.querySelector(`[data-slot="${k}"]`); if (!s) continue; const im = new Image(); im.src = typeof v === 'string' ? v : v.src; im.alt = (typeof v === 'object' && v.alt) || s.dataset.alt || ''; s.querySelectorAll(':scope > img').forEach((o) => o.remove()); s.prepend(im); } };
+  document.querySelectorAll('[data-slot] img').forEach((i) => { if (i.complete && !i.naturalWidth) i.remove(); else i.addEventListener('error', () => i.remove(), { once: true }); });</script>
+</Base>

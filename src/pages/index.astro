@@ -1,0 +1,17 @@
+---
+// Wurzel: leitet anhand der Browsersprache auf /de/ oder /en/ weiter.
+---
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <title>Tim Kibele</title>
+    <meta http-equiv="refresh" content="0; url=/de/" />
+    <link rel="canonical" href="https://www.timkibele.com/de/" />
+    <script is:inline>
+      var l = (navigator.language || 'de').toLowerCase().startsWith('de') ? 'de' : 'en';
+      location.replace('/' + l + '/');
+    </script>
+  </head>
+  <body><a href="/de/">Deutsch</a> · <a href="/en/">English</a></body>
+</html>

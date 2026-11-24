@@ -1,0 +1,14 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { languages, t, type Lang } from '../../../i18n/ui';
+
+export function getStaticPaths() {
+  return languages.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+const tr = t(lang);
+---
+<Base lang={lang} title={tr.cv.title} path="lebenslauf/">
+  <h1>{tr.cv.title}</h1>
+  <p class="lead">{lang === 'de' ? 'Platzhalter – hier kommen Stationen, Skills und Ausbildung hin.' : 'Placeholder – experience, skills and education go here.'}</p>
+</Base>

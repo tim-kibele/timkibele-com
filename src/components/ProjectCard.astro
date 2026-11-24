@@ -1,0 +1,17 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { t, type Lang } from '../i18n/ui';
+interface Props { project: CollectionEntry<'projects'>; lang: Lang }
+const { project, lang } = Astro.props;
+const { data } = project;
+const tr = t(lang);
+---
+<article class="card">
+  <h3>{data.title[lang]}</h3>
+  <p>{data.description[lang]}</p>
+  {data.tags.length > 0 && <ul class="tags">{data.tags.map((tag) => <li>{tag}</li>)}</ul>}
+  <div class="links">
+    {data.url && <a href={data.url}>{tr.projects.open} ↗</a>}
+    {data.repo && <a href={data.repo}>{tr.projects.code} ↗</a>}
+  </div>
+</article>
