@@ -28,7 +28,7 @@ pnpm-debug.log*
 
 # claude skills and planning notes
 .claude/skills/
-plan.md
+PLAN.md
 
 # Impeccable (lokale Arbeitsdateien)
 .impeccable/
