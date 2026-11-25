@@ -47,7 +47,23 @@ const last = staticQuests[staticQuests.length - 1];
   const svg = document.querySelector<SVGSVGElement>('.gamepad');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   if (svg) {
-    const hearts = [...svg.querySelectorAll<SVGElement>('.heart')];
+    // Auf schmalen Bildschirmen ist die Leiste ausgeblendet. Dort gibt es stattdessen eine kleine Herzleiste
+    // unter dem Einleitungsabsatz, damit beide Easter Eggs auch am Handy erreichbar sind.
+    const NS = 'http://www.w3.org/2000/svg';
+    const hud = document.createElementNS(NS, 'svg');
+    hud.setAttribute('class', 'hud');
+    hud.setAttribute('viewBox', '30 6 80 40');
+    hud.setAttribute('aria-hidden', 'true');
+    hud.setAttribute('focusable', 'false');
+    const hudHit = document.createElementNS(NS, 'rect');
+    hudHit.setAttribute('class', 'hearts-hit');
+    for (const [k, v] of Object.entries({ x: '30', y: '6', width: '80', height: '40' })) hudHit.setAttribute(k, v);
+    hud.append(hudHit);
+    svg.querySelectorAll('.heart').forEach((h) => hud.append(h.cloneNode()));
+    const lead = document.querySelector('.split-text .lead');
+    if (lead) lead.after(hud);
+    else document.querySelector('.split-text')?.prepend(hud);
+    const hearts = [...document.querySelectorAll<SVGElement>('.gamepad .heart, .hud .heart')];
     const quests = [...svg.querySelectorAll<SVGGElement>('.quest:not(.boss-quest)')];
     const bossQuest = svg.querySelector<SVGGElement>('.boss-quest')!;
     const boss = document.querySelector<HTMLElement>('.boss');
@@ -58,6 +74,9 @@ const last = staticQuests[staticQuests.length - 1];
     const fill = svg.querySelector<SVGRectElement>('.xp-fill')!;
     const top = Number(track.dataset.top);
     const hit = svg.querySelector<SVGElement>('.hearts-hit')!;
+    const sizeGap = () => {
+      if (gap) gap.style.height = `${innerHeight * 2}px`;
+    };
     const rand = (a: number, b: number) => a + Math.random() * (b - a);
 
     let bossY = 0;
@@ -70,9 +89,9 @@ const last = staticQuests[staticQuests.length - 1];
 
     // Jede Aufgabe steht auf Höhe der Überschrift ihres Abschnitts.
     const layout = () => {
+      sizeGap();
       const w = svg.getBoundingClientRect().width;
       if (w === 0) return;
-      if (gap) gap.style.height = `${innerHeight * 2}px`;
       const scale = w / 140;
       const svgTop = svg.getBoundingClientRect().top;
       const heads = [...document.querySelectorAll('.topic > h2')];
@@ -153,10 +172,8 @@ const last = staticQuests[staticQuests.length - 1];
 
     const hurt = () => {
       if (!live || clicks > 0) return;
-      if (svg.getBoundingClientRect().width > 0) {
-        lives = lives > 1 ? lives - 1 : 3;
-        hearts.forEach((h, i) => h.classList.toggle('lost', i >= lives));
-      }
+      lives = lives > 1 ? lives - 1 : 3;
+      hearts.forEach((h, i) => h.classList.toggle('lost', i >= lives));
       timer = window.setTimeout(hurt, rand(2500, 6000));
     };
 
@@ -200,16 +217,22 @@ const last = staticQuests[staticQuests.length - 1];
       requestAnimationFrame(() => screen.classList.add('on'));
       setTimeout(() => note.classList.add('on'), noMotion ? 0 : 5000);
     };
-    hit.addEventListener('click', () => {
-      if (clicks >= 3) return;
-      clicks++;
-      lives = 3 - clicks;
-      hearts.forEach((h, i) => h.classList.toggle('lost', i >= lives));
-      if (clicks === 3) setTimeout(died, 700);
-    });
+    for (const target of [hit, hudHit]) {
+      target.addEventListener('click', () => {
+        if (clicks >= 3) return;
+        clicks++;
+        lives = 3 - clicks;
+        hearts.forEach((h, i) => h.classList.toggle('lost', i >= lives));
+        if (clicks === 3) setTimeout(died, 700);
+      });
+    }
+    sizeGap();
 
     addEventListener('scroll', onScroll, { passive: true });
-    addEventListener('resize', layout);
+    addEventListener('resize', () => {
+      sizeGap();
+      layout();
+    });
     addEventListener('load', layout);
     new ResizeObserver(layout).observe(document.body);
     if (!reduce.matches) start();
