@@ -11,7 +11,7 @@ text:
 
     Daneben nutze ich Chat-Assistenten wie Claude, ChatGPT und Gemini, Programmierwerkzeuge wie Codex CLI, Cursor und GitHub Copilot, n8n für Automatisierung und lokale Modelle über Ollama.
 
-    Darum ist für mich kontrolliertes Delegieren entscheidend. Ich gebe der KI Aufgaben ab und bleibe dafür verantwortlich, was dabei herauskommt. In meiner E-Mail-Automation entscheidet das Modell nur, ob eine Mail eine Anfrage ist, und zieht Angaben heraus. Alles andere läuft nach festen Regeln, und die Dokumentation sagt offen, dass die KI sich irren kann.
+    Darum ist für mich kontrolliertes Delegieren mit einem Human in the Loop entscheidend. Ich gebe der KI Aufgaben ab und bleibe dafür verantwortlich, was dabei herauskommt. In meiner E-Mail-Automation entscheidet das Modell nur, ob eine Mail eine Anfrage ist, und zieht Angaben heraus. Alles andere läuft nach festen Regeln, und die Dokumentation sagt offen, dass die KI sich irren kann.
 
     Ich denke sogar, dass es keine Junior-Entwickler mehr geben wird, die alles selbst schreiben. Auch sie werden Aufgaben an ein Team von KI-Agenten delegieren. Die Arbeit verschiebt sich dann vom Schreiben einzelner Zeilen dazu, Aufgaben klar zu beschreiben und Ergebnisse zu prüfen.
 
@@ -23,7 +23,7 @@ text:
 
     Besides that I use chat assistants such as Claude, ChatGPT and Gemini, coding tools such as Codex CLI, Cursor and GitHub Copilot, n8n for automation and local models through Ollama.
 
-    That is why controlled delegation matters so much to me. I hand tasks to AI and stay responsible for what comes out. In my email automation, the model only decides whether a mail is an enquiry and pulls out details. Everything else follows fixed rules, and the documentation states openly that the AI can be wrong.
+    That is why controlled delegation with a human in the loop matters so much to me. I hand tasks to AI and stay responsible for what comes out. In my email automation, the model only decides whether a mail is an enquiry and pulls out details. Everything else follows fixed rules, and the documentation states openly that the AI can be wrong.
 
     I even think there will be no junior developers who write everything themselves. They too will delegate tasks to a team of AI agents. The work then shifts from writing individual lines to describing tasks clearly and checking the results.
 

@@ -190,6 +190,10 @@ h2 { margin-top: var(--space-2xl); }
 .workflow .wf-node.on, .agents .wf-node.on { color: var(--color-accent); }
 .workflow .wf-node.on rect, .agents .wf-node.on rect { stroke: var(--color-accent); }
 .workflow .pulse, .agents .pulse { fill: var(--color-accent); }
+.agents .edge.loop { display: none; }
+.agents .edge.loop.linked { display: inline; }
+.agents:not(.linked) [data-n='A'], .agents:not(.linked) [data-n='D'] { cursor: grab; touch-action: none; }
+.agents .drag-line { fill: none; stroke: var(--color-accent); stroke-width: 1.5; stroke-dasharray: 4 4; stroke-linecap: round; pointer-events: none; }
 
 /* animation: neural net */
 .neural-net .edge { stroke: var(--color-rule); stroke-width: 0.8; stroke-opacity: 0.8; transition: stroke var(--dur-long) var(--ease-out), stroke-opacity var(--dur-long) var(--ease-out); }

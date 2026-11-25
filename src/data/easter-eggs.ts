@@ -20,4 +20,11 @@ export const eggs: Egg[] = [
     title: { de: 'Der Endgegner', en: 'The final boss' },
     found: { de: 'Bis ganz ans Ende gescrollt und den Endgegner aufgedeckt.', en: 'Scrolled all the way down and uncovered the final boss.' },
   },
+  {
+    id: 'loop-closed',
+    path: 'interessen/ki/',
+    page: { de: 'KI-Seite', en: 'AI page' },
+    title: { de: 'Der Kreis schließt sich', en: 'Closing the loop' },
+    found: { de: 'Die Verbindung vom Ergebnis zurück zum Menschen gezogen.', en: 'Drew the connection from the result back to the human.' },
+  },
 ];

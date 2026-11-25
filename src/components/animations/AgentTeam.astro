@@ -18,7 +18,8 @@ const edges = links.map((key) => {
   const y1 = a.y + a.s, y2 = b.y - b.s, ym = (y1 + y2) / 2;
   return { key, d: `M${a.x} ${y1} C${a.x} ${ym} ${b.x} ${ym} ${b.x} ${y2}` };
 });
-// Rückweg vom Ergebnis zum Menschen, links an den Agenten vorbei.
+// Rückweg vom Ergebnis zum Menschen, links an den Agenten vorbei. Er fehlt zunächst (Easter Egg): Wer ihn
+// vom Ergebnis zum Menschen zieht, schließt den Kreislauf, und erst dann prüft der Mensch die Ergebnisse.
 edges.push({ key: 'D-A', d: 'M50 630 H10 Q4 630 4 624 V66 Q4 60 10 60 H50' });
 const icons: Record<string, string> = {
   person: '<circle cx="0" cy="-3" r="3.2"/><path d="M-7 8 V6 C-7 3.5 -3.5 2.8 0 2.8 C3.5 2.8 7 3.5 7 6 V8 M-2.2 3.2 L0 6.5 L2.2 3.2 M0 6.5 V8"/>',
@@ -29,7 +30,7 @@ const icons: Record<string, string> = {
 ---
 <svg class="margin-art agents" viewBox="0 0 140 700" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
   <g>
-    {edges.map((e) => <path class="edge" data-e={e.key} d={e.d} />)}
+    {edges.map((e) => <path class={e.key === 'D-A' ? 'edge loop' : 'edge'} data-e={e.key} d={e.d} />)}
   </g>
   <g>
     {nodes.map((n) => (
@@ -43,6 +44,8 @@ const icons: Record<string, string> = {
 </svg>
 
 <script>
+  import { unlock } from '../../scripts/achievements';
+
   const svg = document.querySelector<SVGSVGElement>('.agents');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   if (svg) {
@@ -52,6 +55,7 @@ const icons: Record<string, string> = {
     svg.querySelectorAll<SVGPathElement>('[data-e]').forEach((e) => (edgeEl[e.dataset.e!] = e));
     const layer = svg.querySelector('.pulses')!;
     let alive = false;
+    let linked = false; // der Rückweg zum Menschen ist erst nach dem Ziehen da
 
     const wait = (ms: number) => new Promise<void>((res) => setTimeout(res, ms));
     const rand = (a: number, b: number) => a + Math.random() * (b - a);
@@ -115,10 +119,11 @@ const icons: Record<string, string> = {
         on(nodeEl.B, 900);
         await wait(250);
         await Promise.all(['C1', 'C2', 'C3'].map((id, i) => work(id, i * 160)));
-        await review();
+        if (linked) await review();
+        else await wait(900);
 
         // Manchmal ist das Ergebnis nicht gut genug: Der Mensch schickt einen Agenten noch einmal los.
-        if (Math.random() < 0.4) {
+        if (linked && Math.random() < 0.4) {
           on(nodeEl.A, 900);
           await pulse('A-B');
           on(nodeEl.B, 900);
@@ -128,6 +133,75 @@ const icons: Record<string, string> = {
         await wait(rand(1200, 2000));
       }
     };
+
+    // Easter Egg: Das Ergebnis lässt sich per Ziehen mit dem Menschen verbinden (oder umgekehrt).
+    const loop = edgeEl['D-A'];
+    const ends: Record<string, { id: string; x: number; y: number }> = {
+      D: { id: 'A', x: 50, y: 630 },
+      A: { id: 'D', x: 50, y: 60 },
+    };
+    const toSvg = (x: number, y: number) => {
+      const pt = svg.createSVGPoint();
+      pt.x = x;
+      pt.y = y;
+      return pt.matrixTransform(svg.getScreenCTM()!.inverse());
+    };
+    for (const id of ['A', 'D']) {
+      nodeEl[id].addEventListener('pointerdown', (down) => {
+        if (linked) return;
+        const e = down as PointerEvent;
+        e.preventDefault();
+        const from = ends[id];
+        const target = nodeEl[from.id];
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        line.setAttribute('class', 'drag-line');
+        layer.appendChild(line);
+        // Mensch und Ergebnis liegen weiter auseinander als ein Bildschirm hoch ist: Am oberen oder unteren
+        // Rand scrollt die Seite mit, und die Linie folgt auch beim Scrollen.
+        let cx = e.clientX;
+        let cy = e.clientY;
+        let dragging = true;
+        const draw = () => {
+          const p = toSvg(cx, cy);
+          line.setAttribute('d', `M${from.x} ${from.y} L${p.x} ${p.y}`);
+        };
+        const edge = () => {
+          if (!dragging) return;
+          const zone = 90;
+          if (cy < zone) scrollBy(0, -Math.ceil((zone - cy) / 6));
+          else if (cy > innerHeight - zone) scrollBy(0, Math.ceil((cy - (innerHeight - zone)) / 6));
+          requestAnimationFrame(edge);
+        };
+        draw();
+        requestAnimationFrame(edge);
+        const move = (ev: PointerEvent) => {
+          cx = ev.clientX;
+          cy = ev.clientY;
+          draw();
+        };
+        const done = (ev: PointerEvent) => {
+          dragging = false;
+          removeEventListener('scroll', draw);
+          removeEventListener('pointermove', move);
+          removeEventListener('pointerup', done);
+          removeEventListener('pointercancel', done);
+          line.remove();
+          const r = target.getBoundingClientRect();
+          const pad = 14;
+          const hit = ev.clientX > r.left - pad && ev.clientX < r.right + pad && ev.clientY > r.top - pad && ev.clientY < r.bottom + pad;
+          if (ev.type !== 'pointerup' || !hit) return;
+          linked = true;
+          loop.classList.add('linked');
+          svg.classList.add('linked');
+          on(nodeEl.A, 1400);
+          unlock('loop-closed');
+        };
+        addEventListener('scroll', draw, { passive: true });
+        addEventListener('pointermove', move);
+        addEventListener('pointerup', done);
+        addEventListener('pointercancel', done);
+      });
+    }
 
     if (!reduce.matches) play();
     reduce.addEventListener('change', () => {
