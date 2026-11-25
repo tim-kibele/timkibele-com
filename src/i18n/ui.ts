@@ -20,7 +20,7 @@ export const ui = {
       intro: 'Wofür ich mich interessiere und was mir wichtig ist.',
       note: 'Text folgt.',
     },
-    cv: { title: 'Lebenslauf' },
+    cv: { title: 'Lebenslauf', pdf: 'Als PDF herunterladen', pdfFile: 'Tim-Kibele-Lebenslauf.pdf' },
     achievements: {
       title: 'Geheimnisse',
       intro: 'Auf dieser Seite sind Easter Eggs versteckt. Gefundene stehen hier, für alle anderen gibt es einen Tipp.',
@@ -50,7 +50,7 @@ export const ui = {
       intro: 'What I am into and what matters to me.',
       note: 'Text to come.',
     },
-    cv: { title: 'CV' },
+    cv: { title: 'CV', pdf: 'Download as PDF', pdfFile: 'Tim-Kibele-CV.pdf' },
     achievements: {
       title: 'Secrets',
       intro: 'This site hides Easter eggs. The ones you found are listed here; for the others there is a hint.',

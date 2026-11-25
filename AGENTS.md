@@ -39,3 +39,10 @@ Consult these guides before working on related tasks:
 
 - Jeder Text auf der Seite (DE und EN) läuft vor dem Zeigen und Committen durch den Skill `humanizer` (`.claude/skills/humanizer/`, https://github.com/blader/humanizer). Fakten, Zahlen und Namen bleiben unverändert, die Stimme des Autors bleibt erhalten, nichts wird erfunden.
 - Interessenseiten: `src/content/interests/<thema>.md`, Feld `text` je Sprache; eine Leerzeile trennt Absätze.
+
+## Suche, Vorschau und PDF
+
+- Sitemap: `@astrojs/sitemap` (Filter in `astro.config.mjs`), `public/robots.txt` verweist darauf. Familie und Freundin sind ausgenommen, bis ihre Texte da sind; dann den Filter anpassen.
+- Link-Vorschau: Open-Graph- und Twitter-Tags in `src/layouts/Base.astro`, ein gemeinsames Bild `public/og.png` (1200 × 630, Name und Porträt).
+- Lebenslauf-PDFs (`public/Tim-Kibele-Lebenslauf.pdf`, `public/Tim-Kibele-CV.pdf`) kommen aus dem Druckstil der Lebenslaufseite (`@media print` in `global.css`). Nach jeder Änderung am Lebenslauf neu erzeugen: `npm run build`, dann `node scripts/cv-pdf.mjs` (braucht Playwright mit Chromium lokal).
+- Kein RSS: Es gibt keinen Blog und keine Berichte, die ein Feed ausliefern könnte.

@@ -358,3 +358,15 @@ h2 { margin-top: var(--space-2xl); }
   .equalizer .eq-bar { animation: eq calc(1.3s + var(--v) * 0.2s) ease-in-out infinite alternate; animation-delay: calc(var(--i) * -0.17s); }
 }
 @keyframes eq { from { transform: scaleX(0.22); } to { transform: scaleX(1); } }
+
+/* print and PDF export (CV page) */
+.print-name { display: none; }
+.cv-actions { margin-top: var(--space-lg); }
+@media print {
+  :root { color-scheme: light; }
+  html, body { background: transparent; }
+  header.site, footer.site, .cv-actions, .toast, .hud, .gitlog { display: none !important; }
+  .print-name { display: block; font-size: var(--text-sm); color: var(--color-muted); margin: 0 0 var(--space-sm); }
+  .cv h2 { margin-top: var(--space-xl); break-after: avoid; }
+  .cv-row { break-inside: avoid; }
+}

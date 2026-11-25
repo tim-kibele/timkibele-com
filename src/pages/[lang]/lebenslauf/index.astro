@@ -65,8 +65,10 @@ const sections = [
 ] as const;
 ---
 <Base lang={lang} title={tr.cv.title} description={cv.profile} path="lebenslauf/">
+  <p class="print-name">Tim Kibele · www.timkibele.com</p>
   <h1>{tr.cv.title}</h1>
   <p class="lead">{cv.profile}</p>
+  <p class="cv-actions"><a class="btn" href={`/${tr.cv.pdfFile}`} download>{tr.cv.pdf}</a></p>
 
   <div class="cv">
     {sections.map(([heading, rows]) => (

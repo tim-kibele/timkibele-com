@@ -29,6 +29,18 @@ const nav = [
     <link rel="canonical" href={`${site}/${lang}/${path}`} />
     <link rel="alternate" hreflang="de" href={`${site}/de/${path}`} />
     <link rel="alternate" hreflang="en" href={`${site}/en/${path}`} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={tr.siteTitle} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={`${site}/${lang}/${path}`} />
+    <meta property="og:locale" content={lang === 'de' ? 'de_DE' : 'en_US'} />
+    <meta property="og:locale:alternate" content={lang === 'de' ? 'en_US' : 'de_DE'} />
+    <meta property="og:image" content={`${site}/og.png`} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={tr.home.portraitAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
     <header class="site">
