@@ -1,17 +1,44 @@
 ---
 // Kontaktadresse, die nicht im Klartext im HTML steht: Ohne JavaScript erscheint "tim [at] timkibele [dot] info",
-// mit JavaScript ersetzt das Skript sie durch einen mailto-Link. Die Adresse wird hier nur einmal gepflegt.
+// mit JavaScript ersetzt das Skript sie durch einen mailto-Link. Ein Klick kopiert die Adresse zusätzlich in die
+// Zwischenablage, weil nicht jeder ein Mailprogramm hat. Die Adresse wird hier nur einmal gepflegt.
 const address = 'tim@timkibele.info';
 const encoded = Buffer.from(address).toString('base64');
 ---
 <span class="mail" data-e={encoded}>tim [at] timkibele [dot] info</span>
 
 <script>
+  const copy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // Ohne sicheren Kontext (z. B. http im lokalen Netz) bleibt nur der Umweg über ein Textfeld.
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      const ok = document.execCommand('copy');
+      area.remove();
+      return ok;
+    }
+  };
+
   document.querySelectorAll<HTMLElement>('.mail').forEach((el) => {
     const address = atob(el.dataset.e!);
     const link = document.createElement('a');
     link.href = `mailto:${address}`;
     link.textContent = address;
-    el.replaceWith(link);
+    const note = document.createElement('span');
+    note.className = 'mail-note';
+    note.setAttribute('role', 'status');
+    link.addEventListener('click', async () => {
+      if (!(await copy(address))) return;
+      note.textContent = document.documentElement.lang === 'de' ? 'Adresse kopiert' : 'Address copied';
+      setTimeout(() => (note.textContent = ''), 3000);
+    });
+    el.replaceWith(link, note);
   });
 </script>
