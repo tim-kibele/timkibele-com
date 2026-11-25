@@ -1,0 +1,57 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { eggs } from '../../../data/easter-eggs';
+import { languages, t, type Lang } from '../../../i18n/ui';
+
+export function getStaticPaths() {
+  return languages.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+const tr = t(lang);
+const a = tr.achievements;
+---
+<Base lang={lang} title={a.title} description={a.intro} path="erfolge/">
+  <h1>{a.title}</h1>
+  <p class="lead">{a.intro}</p>
+  <p class="ach-count" aria-live="polite"><span data-count>0</span> {a.of} {eggs.length}</p>
+
+  <ul class="ach-list">
+    {eggs.map((e) => (
+      <li class="ach-row" data-egg={e.id}>
+        <svg class="ach-mark" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+          <rect class="box" x="1" y="1" width="16" height="16" rx="3.5" />
+          <path class="tick" d="M5 9.5 L8 12.5 L13.5 5.5" />
+        </svg>
+        <div>
+          <h2 class="ach-title"><span class="when-locked">???</span><span class="when-found">{e.title[lang]}</span></h2>
+          <p class="when-found">{e.found[lang]}</p>
+          <p class="when-locked">{a.tip}: {a.hiddenOn} <a href={`/${lang}/${e.path}`}>{e.page[lang]}</a>.</p>
+        </div>
+      </li>
+    ))}
+  </ul>
+
+  <p class="ach-note">{a.local} <button class="ach-reset" type="button">{a.reset}</button></p>
+</Base>
+
+<script>
+  import { read, reset } from '../../../scripts/achievements';
+
+  const rows = [...document.querySelectorAll<HTMLElement>('.ach-row')];
+  const count = document.querySelector('[data-count]')!;
+  const render = () => {
+    const found = read();
+    let n = 0;
+    for (const row of rows) {
+      const on = Boolean(found[row.dataset.egg!]);
+      row.classList.toggle('found', on);
+      if (on) n++;
+    }
+    count.textContent = String(n);
+  };
+  document.querySelector('.ach-reset')!.addEventListener('click', () => {
+    reset();
+    render();
+  });
+  render();
+</script>

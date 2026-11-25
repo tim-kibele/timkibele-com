@@ -42,6 +42,8 @@ const last = staticQuests[staticQuests.length - 1];
 </svg>
 
 <script>
+  import { unlock } from '../../scripts/achievements';
+
   const svg = document.querySelector<SVGSVGElement>('.gamepad');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   if (svg) {
@@ -123,6 +125,7 @@ const last = staticQuests[staticQuests.length - 1];
     const reveal = () => {
       if (revealed || !boss) return;
       revealed = true;
+      unlock('final-boss');
       const still = reduce.matches;
       document.documentElement.style.overflowAnchor = 'none';
       boss.hidden = false;
@@ -192,6 +195,7 @@ const last = staticQuests[staticQuests.length - 1];
       document.querySelectorAll('header.site, main, footer').forEach((el) => el.setAttribute('inert', ''));
       document.body.style.overflow = 'hidden';
       document.body.append(screen);
+      unlock('you-died');
       screen.focus();
       requestAnimationFrame(() => screen.classList.add('on'));
       setTimeout(() => note.classList.add('on'), noMotion ? 0 : 5000);

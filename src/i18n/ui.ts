@@ -5,7 +5,7 @@ export const ui = {
   de: {
     siteTitle: 'Tim Kibele',
     tagline: 'Informatikstudent an der LMU München.',
-    nav: { home: 'Start', projects: 'Projekte', interests: 'Interessen', cv: 'Lebenslauf', legal: 'Datenschutz' },
+    nav: { home: 'Start', projects: 'Projekte', interests: 'Interessen', cv: 'Lebenslauf', legal: 'Datenschutz', achievements: 'Erfolge' },
     home: {
       heading: 'Hallo, ich bin Tim.',
       intro: 'Hier zeige ich, woran ich arbeite und was ich dabei lerne.',
@@ -21,6 +21,12 @@ export const ui = {
       note: 'Text folgt.',
     },
     cv: { title: 'Lebenslauf' },
+    achievements: {
+      title: 'Erfolge',
+      intro: 'Auf dieser Seite sind Easter Eggs versteckt. Gefundene stehen hier, für alle anderen gibt es einen Tipp.',
+      of: 'von', tip: 'Tipp', hiddenOn: 'Versteckt auf der',
+      local: 'Der Fortschritt bleibt in diesem Browser.', reset: 'Zurücksetzen',
+    },
     legal: { title: 'Datenschutz' },
     switchTo: 'English',
     theme: { dark: 'Dunkel', light: 'Hell' },
@@ -29,7 +35,7 @@ export const ui = {
   en: {
     siteTitle: 'Tim Kibele',
     tagline: 'Computer science student at LMU Munich.',
-    nav: { home: 'Home', projects: 'Projects', interests: 'Interests', cv: 'CV', legal: 'Privacy' },
+    nav: { home: 'Home', projects: 'Projects', interests: 'Interests', cv: 'CV', legal: 'Privacy', achievements: 'Achievements' },
     home: {
       heading: "Hi, I'm Tim.",
       intro: 'Here I share what I work on and what I learn.',
@@ -45,6 +51,12 @@ export const ui = {
       note: 'Text to come.',
     },
     cv: { title: 'CV' },
+    achievements: {
+      title: 'Achievements',
+      intro: 'This site hides Easter eggs. The ones you found are listed here; for the others there is a hint.',
+      of: 'of', tip: 'Hint', hiddenOn: 'Hidden on the',
+      local: 'Your progress stays in this browser.', reset: 'Reset',
+    },
     legal: { title: 'Privacy policy' },
     switchTo: 'Deutsch',
     theme: { dark: 'Dark', light: 'Light' },
