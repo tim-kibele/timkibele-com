@@ -14,9 +14,13 @@ const { project } = Astro.props;
 const tr = t(lang);
 const d = project.data.detail![lang];
 const Animation = project.data.animation ? animations[project.data.animation] : null;
+// Mit Animation: breites Layout, große Animation links, Text rechts. Ohne Animation: schmale einspaltige Seite.
+const split = Animation !== null;
 ---
-<Base lang={lang} title={project.data.title[lang]} description={project.data.description[lang]} path={`projekte/${slug}/`}>
-  {Animation && <Animation />}
+<Base lang={lang} title={project.data.title[lang]} description={project.data.description[lang]} path={`projekte/${slug}/`} wide={split}>
+  <div class={split ? 'split' : undefined}>
+  {Animation && (split ? <div class="split-art"><Animation /></div> : <Animation />)}
+  <div class={split ? 'split-text' : undefined}>
   <p><a href={`/${lang}/projekte/`}>← {tr.back}</a></p>
   <h1>{project.data.title[lang]}</h1>
   <p class="lead">{d.summary}</p>
@@ -38,4 +42,6 @@ const Animation = project.data.animation ? animations[project.data.animation] : 
     <!-- Easter-Egg-Platzhalter: bewusst unsichtbar, bis es etwas gibt -->
     <div data-easter={slug} hidden></div>
   </section>
+  </div>
+  </div>
 </Base>

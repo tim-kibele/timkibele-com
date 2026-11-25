@@ -101,11 +101,16 @@ h2 { margin-top: var(--space-2xl); }
 .cv-row .org { font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-2xs); }
 @media (max-width: 40rem) { .cv-row { grid-template-columns: minmax(0, 1fr); gap: var(--space-2xs); } }
 
-/* margin art: small decorative animation at the right edge of a project page, anchored to the top of the page so it scrolls away with it (hidden on narrow screens) */
+/* margin art: decorative animation, shown only inside the split layout below */
 .margin-art { display: none; }
-@media (min-width: 77rem) {
-  .margin-art { display: block; position: absolute; top: 0; right: var(--space-lg); width: clamp(7.5rem, calc((100% - 56rem) / 2 - 2.5rem), 8.25rem); height: 100vh; pointer-events: none; }
+
+/* pages with an animation (projects and interests): wide layout, large animation on the left, text bound to the right */
+.wrap--wide { max-width: 80rem; }
+@media (min-width: 64rem) {
+  .split { display: grid; grid-template-columns: clamp(12rem, 18vw, 17rem) minmax(0, 44rem); justify-content: space-between; gap: var(--space-2xl); align-items: start; }
+  .split .margin-art { display: block; position: static; width: 100%; height: auto; }
 }
+@media (max-width: 63.99rem) { .split-art { display: none; } }
 
 /* animation: scan (Stackscan page) */
 .scan text { font-family: var(--font-body); font-size: 11px; fill: var(--color-muted); }
@@ -195,3 +200,8 @@ h2 { margin-top: var(--space-2xl); }
 .gamepad .quest .line { fill: var(--tint-moss); }
 .gamepad .quest.done .box { fill: var(--color-accent); stroke: var(--color-accent); }
 .gamepad .quest.done .tick { opacity: 1; }
+
+/* animation: three small keyboards (Keyboards page) */
+.keyboard .case { fill: none; stroke: var(--color-rule-2); stroke-width: 1; }
+.keyboard .key { fill: var(--color-paper); stroke: var(--color-rule-2); stroke-width: 0.7; transition: fill var(--dur-micro) var(--ease-out), stroke var(--dur-micro) var(--ease-out); }
+.keyboard .key.on { fill: var(--color-accent); stroke: var(--color-accent); }

@@ -2,6 +2,7 @@
 title:
   de: Mechanische Tastaturen
   en: Mechanical keyboards
+animation: keyboard
 text:
   de: |-
     Mechanische Tastaturen sind seit rund vier Jahren mein Hobby. Entdeckt habe ich es über YouTube-Videos: Die Tastaturen klangen so gut, dass ich auch eine haben wollte. Inzwischen habe ich drei selbst gebaut.

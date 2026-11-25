@@ -3,17 +3,17 @@
 // Die Struktur ist festes SVG (sichtbar ohne JavaScript und bei "Bewegung reduzieren"),
 // das Skript lässt nur die Werte laufen.
 const hearts = [44, 70, 96];
-const quests = [330, 370, 410];
+const quests = [220, 260, 300];
 const heart = 'M0 5 C-8 -1 -4 -7 0 -3 C4 -7 8 -1 0 5 Z';
 ---
-<svg class="margin-art gamepad" viewBox="0 0 140 470" preserveAspectRatio="xMidYMin meet" aria-hidden="true" focusable="false">
+<svg class="margin-art gamepad" viewBox="0 0 140 340" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
   {hearts.map((x) => (
-    <path class="heart" transform={`translate(${x} 160) scale(1.8)`} d={heart} />
+    <path class="heart" transform={`translate(${x} 50) scale(1.8)`} d={heart} />
   ))}
 
-  <text class="level" x="20" y="238">Lv 3</text>
-  <rect class="xp-track" x="20" y="248" width="100" height="8" rx="4" />
-  <rect class="xp-fill" x="20" y="248" width="100" height="8" rx="4" style="transform: scaleX(0.6)" />
+  <text class="level" x="20" y="128">Lv 3</text>
+  <rect class="xp-track" x="20" y="138" width="100" height="8" rx="4" />
+  <rect class="xp-fill" x="20" y="138" width="100" height="8" rx="4" style="transform: scaleX(0.6)" />
 
   {quests.map((y, i) => (
     <g class={`quest${i < 2 ? ' done' : ''}`} transform={`translate(0 ${y})`}>

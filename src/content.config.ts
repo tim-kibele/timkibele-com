@@ -37,7 +37,7 @@ const interests = defineCollection({
     title: text,
     text: text.optional(),
     // Kleine Animation am rechten Rand, Namen siehe src/components/animations/index.ts
-    animation: z.enum(['agents', 'gamepad']).optional(),
+    animation: z.enum(['agents', 'gamepad', 'keyboard']).optional(),
   }),
 });
 

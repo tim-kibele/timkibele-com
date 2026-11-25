@@ -2,8 +2,8 @@
 import '../styles/global.css';
 import { t, other, type Lang } from '../i18n/ui';
 
-interface Props { lang: Lang; title?: string; description?: string; path: string }
-const { lang, title, description, path } = Astro.props;
+interface Props { lang: Lang; title?: string; description?: string; path: string; wide?: boolean }
+const { lang, title, description, path, wide = false } = Astro.props;
 const tr = t(lang);
 const pageTitle = title ? `${title} · ${tr.siteTitle}` : tr.siteTitle;
 const desc = description ?? tr.tagline;
@@ -31,7 +31,7 @@ const nav = [
   </head>
   <body>
     <header class="site">
-      <div class="wrap">
+      <div class={wide ? 'wrap wrap--wide' : 'wrap'}>
         <a class="brand" href={href('')}>{tr.siteTitle}</a>
         <nav>
           {nav.map(([p, label]) => (
@@ -45,9 +45,9 @@ const nav = [
         </nav>
       </div>
     </header>
-    <main class="wrap"><slot /></main>
+    <main class={wide ? 'wrap wrap--wide' : 'wrap'}><slot /></main>
     <footer class="site">
-      <div class="wrap">
+      <div class={wide ? 'wrap wrap--wide' : 'wrap'}>
         © {new Date().getFullYear()} Tim Kibele · <a href={href('datenschutz/')}>{tr.nav.legal}</a>
       </div>
     </footer>

@@ -28,9 +28,12 @@ const blocks = (item.data.text?.[lang] ?? tr.interests.note).split(/\n\s*\n/).ma
   return { text: b };
 });
 const firstText = blocks.findIndex((b) => 'text' in b);
+const split = Animation !== null;
 ---
-<Base lang={lang} title={title} description={tr.interests.intro} path={`interessen/${slug}/`}>
-  {Animation && <Animation />}
+<Base lang={lang} title={title} description={tr.interests.intro} path={`interessen/${slug}/`} wide={split}>
+  <div class={split ? 'split' : undefined}>
+  {Animation && <div class="split-art"><Animation /></div>}
+  <div class={split ? 'split-text' : undefined}>
   <p><a href={`/${lang}/interessen/`}>← {tr.back}</a></p>
   <section class="topic">
     <h1>{title}</h1>
@@ -42,4 +45,6 @@ const firstText = blocks.findIndex((b) => 'text' in b);
       : <p class={i === firstText ? 'lead' : undefined}>{b.text}</p>
     )}
   </section>
+  </div>
+  </div>
 </Base>
