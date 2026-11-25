@@ -23,6 +23,7 @@
   --color-focus: var(--color-accent); --tint-moss: light-dark(color-mix(in srgb, var(--jade-moss) 24%, transparent), color-mix(in srgb, var(--jade-moss) 30%, transparent));
   --color-band: var(--jade-ink); --color-band-ink: var(--jade-grey);
   --font-display: "Vollkorn", ui-serif, Georgia, serif; --font-body: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
   --font-outlier: "Newsreader", ui-serif, Georgia, serif;
   --radius-card: 4px; --radius-pill: 999px; --rule-hair: 1px; --shadow-card: none;
   --tracking-display: -0.012em; --display-weight: 600;

@@ -38,4 +38,12 @@ export const eggs: Egg[] = [
     hint: { de: 'Manchmal gewinnt man, indem man nichts tut.', en: 'Sometimes you win by doing nothing.' },
     found: { de: 'Das Tippduell gewonnen, schnell getippt oder gar nicht.', en: 'Won the typing race, by typing fast or not at all.' },
   },
+  {
+    id: 'git-log',
+    path: 'lebenslauf/',
+    page: { de: 'Lebenslauf-Seite', en: 'CV page' },
+    title: { de: 'git log', en: 'git log' },
+    hint: { de: 'Ein Werkzeug in meinen Fähigkeiten reagiert auf einen Klick.', en: 'One of the tools in my skills reacts to a click.' },
+    found: { de: 'Auf Git und GitHub geklickt und den Lebenslauf als git log gesehen.', en: 'Clicked Git and GitHub and saw the CV as a git log.' },
+  },
 ];

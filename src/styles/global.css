@@ -319,3 +319,15 @@ h2 { margin-top: var(--space-2xl); }
 /* 404 page */
 .notfound p { margin-top: var(--space-md); }
 .notfound .notfound-en { margin-top: var(--space-2xl); }
+
+/* CV Easter egg: the experience and education shown as git log */
+.gitlog { margin-top: var(--space-2xl); padding: var(--space-lg); border-radius: var(--radius-card); background: var(--color-band); color: var(--color-band-ink); font-family: var(--font-mono); font-size: var(--text-sm); line-height: 1.6; }
+.gitlog[hidden] { display: none; }
+.gitlog p { margin: 0; overflow-wrap: anywhere; }
+.gitlog-commit { margin-top: var(--space-lg); }
+.gitlog-commit .hash { color: var(--jade-sage); }
+.gitlog-commit .msg { margin-top: var(--space-sm); padding-left: var(--space-lg); }
+.gitlog-commit .msg + .msg { margin-top: 0; color: var(--jade-sage); }
+.gitlog-exit { display: block; margin-top: var(--space-lg); padding: 0; font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+.gitlog-exit:hover { text-decoration: underline; }
+.gitlog-exit:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }

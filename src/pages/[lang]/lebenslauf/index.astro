@@ -80,7 +80,7 @@ const sections = [
                 {!r.tags && <h3>{r.title}</h3>}
                 {r.org && <p class="org">{r.org}</p>}
                 {r.text && <p class="org">{r.text}</p>}
-                {r.tags && <ul class="tags">{r.tags.map((tag) => <li>{tag}</li>)}</ul>}
+                {r.tags && <ul class="tags">{r.tags.map((tag) => <li data-egg={tag.startsWith('Git') ? 'git' : undefined}>{tag}</li>)}</ul>}
               </div>
             </li>
           ))}
@@ -89,3 +89,84 @@ const sections = [
     ))}
   </div>
 </Base>
+
+<script>
+  import { unlock } from '../../../scripts/achievements';
+
+  // Easter Egg: Ein Klick auf "Git und GitHub" zeigt Berufserfahrung und Ausbildung als `git log`.
+  // Die Einträge werden aus der Seite gelesen, es kommt nichts Neues dazu. Der Hash ist reine Dekoration
+  // (aus dem Text berechnet, damit er stabil bleibt).
+  const chip = document.querySelector<HTMLElement>('[data-egg="git"]');
+  const cv = document.querySelector<HTMLElement>('.cv');
+  if (chip && cv) {
+    const sections = [...cv.querySelectorAll('section')].slice(0, 2);
+    type Entry = { when: string; title: string; org: string; note: string; start: number };
+    const startOf = (when: string) => {
+      const m = when.match(/^(?:(\d{2})\/)?(\d{4})/);
+      return m ? Number(m[2]) * 12 + Number(m[1] ?? 1) : 0;
+    };
+    const entries: Entry[] = sections
+      .flatMap((s) => [...s.querySelectorAll('.cv-row')])
+      .map((row) => {
+        const when = row.querySelector('.when')?.textContent?.trim() ?? '';
+        const orgs = row.querySelectorAll('.org');
+        return {
+          when,
+          title: row.querySelector('h3')?.textContent?.trim() ?? '',
+          org: orgs[0]?.textContent?.trim() ?? '',
+          note: orgs[1]?.textContent?.trim() ?? '',
+          start: startOf(when),
+        };
+      })
+      .sort((a, b) => b.start - a.start);
+    const hash = (s: string) => {
+      let h = 5381;
+      for (const c of s) h = (h * 33 + c.charCodeAt(0)) >>> 0;
+      return h.toString(16).padStart(8, '0').slice(0, 7);
+    };
+    const line = (cls: string, text: string) => {
+      const p = document.createElement('p');
+      if (cls) p.className = cls;
+      p.textContent = text;
+      return p;
+    };
+
+    const log = document.createElement('section');
+    log.className = 'gitlog';
+    log.hidden = true;
+    log.setAttribute('aria-label', 'git log');
+    log.append(line('gitlog-cmd', '$ git log'));
+    entries.forEach((e, i) => {
+      const block = document.createElement('div');
+      block.className = 'gitlog-commit';
+      block.append(
+        line('hash', `commit ${hash(e.when + e.title)}${i === 0 ? ' (HEAD -> main)' : ''}`),
+        line('', 'Author: Tim Kibele'),
+        line('', `Date:   ${e.when}`),
+        line('msg', [e.title, e.org].filter(Boolean).join(', ')),
+      );
+      if (e.note) block.append(line('msg', e.note));
+      log.append(block);
+    });
+    const exit = document.createElement('button');
+    exit.type = 'button';
+    exit.className = 'gitlog-exit';
+    exit.textContent = '$ exit';
+    log.append(exit);
+    cv.after(log);
+
+    const show = (on: boolean) => {
+      log.hidden = !on;
+      cv.hidden = on;
+    };
+    chip.addEventListener('click', () => {
+      show(true);
+      unlock('git-log');
+      log.scrollIntoView({ block: 'nearest' });
+    });
+    exit.addEventListener('click', () => show(false));
+    addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !log.hidden) show(false);
+    });
+  }
+</script>
