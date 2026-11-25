@@ -24,7 +24,7 @@ const text = {
     noscript: 'Die Schachpartie braucht JavaScript.',
     pieces: { p: 'Bauer', n: 'Springer', b: 'Läufer', r: 'Turm', q: 'Dame', k: 'König' }, w: 'weißer', bl: 'schwarzer',
     bossName: 'Timgnus Kibelsen', bossThinking: 'Timgnus denkt nach …',
-    bossText: 'Du bist ganz unten angekommen. Hier wartet Timgnus Kibelsen, Stockfish auf der höchsten Stufe.',
+    bossText: 'Du bist ganz unten angekommen. Hier wartet Timgnus Kibelsen, der Endgegner.',
   },
   en: {
     bot: 'Stockfish (about 1200)', you: 'You',
@@ -40,11 +40,12 @@ const text = {
     noscript: 'The chess game needs JavaScript.',
     pieces: { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' }, w: 'white', bl: 'black',
     bossName: 'Timgnus Kibelsen', bossThinking: 'Timgnus is thinking …',
-    bossText: 'You made it all the way down. Timgnus Kibelsen is waiting here: Stockfish on its highest setting.',
+    bossText: 'You made it all the way down. Timgnus Kibelsen, the final boss, is waiting here.',
   },
 }[lang];
 const labels = { ...text, bot: boss ? text.bossName : text.bot, thinking: boss ? text.bossThinking : text.thinking };
 ---
+{boss && <div class="boss-gap" aria-hidden="true"></div>}
 <section class={boss ? 'chess boss' : 'chess'} data-labels={JSON.stringify(labels)} data-boss={boss ? '1' : undefined} hidden={boss}>
   {boss && <h2 class="boss-title">{text.bossName}</h2>}
   {boss && <p class="boss-text">{text.bossText}</p>}

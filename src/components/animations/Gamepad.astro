@@ -49,6 +49,7 @@ const last = staticQuests[staticQuests.length - 1];
     const quests = [...svg.querySelectorAll<SVGGElement>('.quest:not(.boss-quest)')];
     const bossQuest = svg.querySelector<SVGGElement>('.boss-quest')!;
     const boss = document.querySelector<HTMLElement>('.boss');
+    const gap = document.querySelector<HTMLElement>('.boss-gap'); // leerer Weg unter der Schachpartie: etwa zwei Bildschirmhöhen
     let revealed = false;
     const levelEl = svg.querySelector('.level')!;
     const track = svg.querySelector<SVGRectElement>('.xp-track')!;
@@ -58,6 +59,7 @@ const last = staticQuests[staticQuests.length - 1];
     const rand = (a: number, b: number) => a + Math.random() * (b - a);
 
     let bossY = 0;
+    let gapEnd = 0;
     let ys = quests.map(() => 0); // Mitte jeder Aufgabe im Bild, in Einheiten
     let live = false;
     let lives = 3;
@@ -68,6 +70,7 @@ const last = staticQuests[staticQuests.length - 1];
     const layout = () => {
       const w = svg.getBoundingClientRect().width;
       if (w === 0) return;
+      if (gap) gap.style.height = `${innerHeight * 2}px`;
       const scale = w / 140;
       const svgTop = svg.getBoundingClientRect().top;
       const heads = [...document.querySelectorAll('.topic > h2')];
@@ -83,9 +86,10 @@ const last = staticQuests[staticQuests.length - 1];
         bossY = (r.top + r.height / 2 - svgTop) / scale;
         bossQuest.setAttribute('transform', `translate(0 ${bossY})`);
       }
+      gapEnd = gap ? (gap.getBoundingClientRect().bottom - svgTop) / scale : ys[ys.length - 1];
       const end = revealed ? bossY : ys[ys.length - 1];
       for (const el of [track, fill]) el.setAttribute('height', String(Math.max(0, end - top)));
-      svg.setAttribute('viewBox', `0 0 140 ${end + 40}`);
+      svg.setAttribute('viewBox', `0 0 140 ${(revealed ? bossY : Math.max(gapEnd, end)) + 40}`);
       update();
     };
 
@@ -96,7 +100,10 @@ const last = staticQuests[staticQuests.length - 1];
       if (w === 0) return;
       const scale = w / 140;
       const p = (innerHeight * 0.55 - svg.getBoundingClientRect().top) / scale;
-      const end = revealed ? bossY : ys[ys.length - 1];
+      // Vor dem Aufdecken wächst die Leiste hinter der letzten Aufgabe nur so weit, wie man gescrollt hat.
+      const lastY = ys[ys.length - 1];
+      const end = revealed ? bossY : Math.max(lastY, Math.min(p, gapEnd));
+      for (const el of [track, fill]) el.setAttribute('height', String(Math.max(0, end - top)));
       fill.style.transform = `scaleY(${Math.min(1, Math.max(0, (p - top) / (end - top)))})`;
       let done = 0;
       quests.forEach((q, i) => {
