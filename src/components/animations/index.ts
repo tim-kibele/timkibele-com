@@ -3,6 +3,7 @@ import Equalizer from './Equalizer.astro';
 import Gamepad from './Gamepad.astro';
 import KeyboardArt from './KeyboardArt.astro';
 import NeuralNet from './NeuralNet.astro';
+import Pebbles from './Pebbles.astro';
 import ScanList from './ScanList.astro';
 import Workflow from './Workflow.astro';
 
@@ -13,6 +14,7 @@ export const animations = {
   'neural-net': NeuralNet,
   workflow: Workflow,
   scan: ScanList,
+  pebbles: Pebbles,
   agents: AgentTeam,
   gamepad: Gamepad,
   keyboard: KeyboardArt,

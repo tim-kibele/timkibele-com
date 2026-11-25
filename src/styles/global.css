@@ -370,3 +370,13 @@ h2 { margin-top: var(--space-2xl); }
   .cv h2 { margin-top: var(--space-xl); break-after: avoid; }
   .cv-row { break-inside: avoid; }
 }
+
+/* animation: pebbles (project page about this website) */
+.pebbles .pebble { stroke: var(--color-rule-2); stroke-width: 1; }
+.pebbles .pebble--ink { fill: var(--jade-ink); }
+.pebbles .pebble--moss { fill: var(--jade-moss); }
+.pebbles .pebble--slate { fill: var(--jade-slate); }
+.pebbles .pebble--sage { fill: var(--jade-sage); }
+.pebbles .pebble--grey { fill: var(--jade-grey); }
+.pebbles .pebble { transition: opacity var(--dur-long) var(--ease-out), transform var(--dur-long) var(--ease-out); }
+html.js .pebbles .pebble.out { opacity: 0; transform: translateY(-90px); }

@@ -1,0 +1,45 @@
+---
+// Dekorative Animation für die Projektseite "Diese Website": Ein Steinturm in den Farben der Seite (Palette "Jade
+// pebble morning") baut sich Stein für Stein von unten auf, hält kurz und beginnt von vorn. Die Struktur ist festes
+// SVG mit fertigem Turm (sichtbar ohne JavaScript und bei "Bewegung reduzieren"), das Skript blendet nur die Steine
+// nacheinander ein.
+const colors = ['ink', 'moss', 'slate', 'sage', 'grey'];
+const widths = [108, 96, 104, 90, 96, 80, 86, 72, 76, 62, 66, 52, 54, 42, 36];
+const shift = [0, -6, 5, -4, 6, -3, 4, -5, 3, -2, 2, -1, 1, -1, 0];
+const pitch = 46;
+const base = 694;
+const stones = widths.map((w, i) => ({ w, cx: 70 + shift[i], cy: base - 21 - i * pitch, color: colors[i % colors.length] }));
+---
+<svg class="margin-art pebbles" viewBox="0 0 140 700" preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false">
+  {stones.map((s) => <ellipse class={`pebble pebble--${s.color}`} cx={s.cx} cy={s.cy} rx={s.w / 2} ry="21" />)}
+</svg>
+
+<script>
+  const svg = document.querySelector<SVGSVGElement>('.pebbles');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  if (svg && !reduce.matches) {
+    const stones = [...svg.querySelectorAll<SVGElement>('.pebble')];
+    const hold = 9; // Schritte, in denen der fertige Turm stehen bleibt
+    let step = 0;
+    let timer = 0;
+    document.documentElement.classList.add('js');
+    stones.forEach((s) => s.classList.add('out'));
+    // Ein Stein alle 450 ms, danach etwa vier Sekunden Pause mit dem fertigen Turm, dann alles zurück.
+    const tick = () => {
+      if (step < stones.length) stones[step].classList.remove('out');
+      if (step === stones.length + hold) {
+        stones.forEach((s) => s.classList.add('out'));
+        step = 0;
+        return;
+      }
+      step++;
+    };
+    timer = window.setInterval(tick, 450);
+    reduce.addEventListener('change', () => {
+      if (reduce.matches) {
+        clearInterval(timer);
+        stones.forEach((s) => s.classList.remove('out'));
+      }
+    });
+  }
+</script>
