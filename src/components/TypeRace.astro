@@ -2,8 +2,8 @@
 import type { Lang } from '../i18n/ui';
 
 // Tippduell gegen einen Bot, der gleichmäßig mit 95 WPM schreibt.
-// Easter Egg: Wer das Rennen startet und fünf Sekunden nach "Los!" nichts tippt, bekommt eine Fehlermeldung im
-// Textfeld, der Bot stürzt ab, und man gewinnt. Der Erfolg gilt für jeden Sieg, auch den ehrlichen.
+// Easter Egg: Wer das Rennen startet und tippt nichts, bis der Bot die Hälfte des Textes geschafft hat, bekommt eine
+// Fehlermeldung im Textfeld, der Bot stürzt ab, und man gewinnt. Der Erfolg gilt für jeden Sieg, auch den ehrlichen.
 // Der Text kommt aus einer festen Liste, der Bot ist reine Simulation im Browser.
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -92,7 +92,6 @@ const resultTemplate = lang === 'de' ? 'Du: {me} WPM, Tim: {bot} WPM, Fehler: {m
     let botChars = 0;
     let lastFrame = 0;
     let typedAny = false;
-    const IDLE_MS = 5000;
 
     const span = (cls: string, txt: string) => {
       const s = document.createElement('span');
@@ -149,11 +148,15 @@ const resultTemplate = lang === 'de' ? 'Du: {me} WPM, Tim: {bot} WPM, Fehler: {m
       }
       fill.bot.style.transform = `scaleX(${botChars / passage.length})`;
       wpmEl.bot.textContent = String(wpm(botChars, now - startedAt));
+      if (!typedAny && botChars >= passage.length / 2) {
+        crash();
+        return;
+      }
       if (botDone) finish(false);
       else raf = requestAnimationFrame(frame);
     };
 
-    // Easter Egg: Nach dem Start kommt keine Eingabe, also meldet das Textfeld einen Fehler und der Bot stürzt ab.
+    // Easter Egg: Bis zur Hälfte des Rennens kommt keine Eingabe, also meldet das Textfeld einen Fehler und der Bot stürzt ab.
     const crash = () => {
       if (!running || typedAny) return;
       running = false;
@@ -195,7 +198,6 @@ const resultTemplate = lang === 'de' ? 'Du: {me} WPM, Tim: {bot} WPM, Fehler: {m
       startedAt = performance.now();
       lastFrame = startedAt;
       raf = requestAnimationFrame(frame);
-      timers.push(window.setTimeout(crash, IDLE_MS));
     };
 
     button.addEventListener('click', () => {
