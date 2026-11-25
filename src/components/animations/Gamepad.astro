@@ -1,25 +1,32 @@
 ---
-// Dekorative Spiel-Oberfläche am rechten Rand für die Gaming-Seite: drei Leben, eine Erfahrungsleiste mit Levelanzeige und eine kleine Aufgabenliste.
-// Die Struktur ist festes SVG (sichtbar ohne JavaScript und bei "Bewegung reduzieren"),
-// das Skript lässt nur die Werte laufen.
+// Dekorative Spiel-Oberfläche für die Gaming-Seite: drei Leben und eine Levelanzeige oben, darunter
+// eine senkrechte Erfahrungsleiste über die ganze Seite. Jeder Abschnitt des Textes ist eine Aufgabe auf
+// der Leiste (das Skript misst die Überschriften). Beim Scrollen füllt sich die Leiste, erreichte
+// Abschnitte werden abgehakt, und das Level steigt. Die Leben schwanken gelegentlich.
+// Die Struktur ist festes SVG und zeigt den fertigen Zustand (sichtbar ohne JavaScript und bei
+// "Bewegung reduzieren"): alle Aufgaben erledigt, Leiste voll.
 const hearts = [44, 70, 96];
-const quests = [220, 260, 300];
 const heart = 'M0 5 C-8 -1 -4 -7 0 -3 C4 -7 8 -1 0 5 Z';
+const trackTop = 96;
+const staticQuests = [170, 250, 330, 410]; // Lage ohne JavaScript
+const lens = [70, 54, 62, 58];
+const last = staticQuests[staticQuests.length - 1];
 ---
-<svg class="margin-art gamepad" viewBox="0 0 140 340" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+<svg class="margin-art gamepad" viewBox={`0 0 140 ${last + 40}`} preserveAspectRatio="xMidYMin meet" aria-hidden="true" focusable="false">
   {hearts.map((x) => (
-    <path class="heart" transform={`translate(${x} 50) scale(1.8)`} d={heart} />
+    <path class="heart" transform={`translate(${x} 26) scale(1.8)`} d={heart} />
   ))}
 
-  <text class="level" x="20" y="128">Lv 3</text>
-  <rect class="xp-track" x="20" y="138" width="100" height="8" rx="4" />
-  <rect class="xp-fill" x="20" y="138" width="100" height="8" rx="4" style="transform: scaleX(0.6)" />
+  <text class="level" x="20" y="76">Lv {staticQuests.length + 1}</text>
 
-  {quests.map((y, i) => (
-    <g class={`quest${i < 2 ? ' done' : ''}`} transform={`translate(0 ${y})`}>
+  <rect class="xp-track" x="27.5" y={trackTop} width="3" height={last - trackTop} rx="1.5" data-top={trackTop} />
+  <rect class="xp-fill" x="27.5" y={trackTop} width="3" height={last - trackTop} rx="1.5" />
+
+  {staticQuests.map((y, i) => (
+    <g class="quest done" transform={`translate(0 ${y})`}>
       <rect class="box" x="22" y="-7" width="14" height="14" rx="3" />
       <path class="tick" d="M25 0 L28.5 3.5 L34 -3.5" />
-      <rect class="line" x="46" y="-1.5" width={i === 0 ? 70 : i === 1 ? 54 : 62} height="3" rx="1.5" />
+      <rect class="line" x="46" y="-1.5" width={lens[i]} height="3" rx="1.5" />
     </g>
   ))}
 </svg>
@@ -29,59 +36,96 @@ const heart = 'M0 5 C-8 -1 -4 -7 0 -3 C4 -7 8 -1 0 5 Z';
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   if (svg) {
     const hearts = [...svg.querySelectorAll<SVGElement>('.heart')];
-    const quests = [...svg.querySelectorAll<SVGElement>('.quest')];
+    const quests = [...svg.querySelectorAll<SVGGElement>('.quest')];
     const levelEl = svg.querySelector('.level')!;
-    const bar = svg.querySelector<SVGElement>('.xp-fill')!;
+    const track = svg.querySelector<SVGRectElement>('.xp-track')!;
+    const fill = svg.querySelector<SVGRectElement>('.xp-fill')!;
+    const top = Number(track.dataset.top);
     const rand = (a: number, b: number) => a + Math.random() * (b - a);
 
-    let level = 3;
-    let xp = 60;
+    let ys = quests.map(() => 0); // Mitte jeder Aufgabe im Bild, in Einheiten
+    let live = false;
     let lives = 3;
     let timer = 0;
-    let alive = false;
 
-    const setXp = () => (bar.style.transform = `scaleX(${xp / 100})`);
-    const setHearts = () => hearts.forEach((h, i) => h.classList.toggle('lost', i >= lives));
-    const flash = (el: Element, ms: number) => {
-      el.classList.add('on');
-      setTimeout(() => el.classList.remove('on'), ms);
+    // Jede Aufgabe steht auf Höhe der Überschrift ihres Abschnitts.
+    const layout = () => {
+      const w = svg.getBoundingClientRect().width;
+      if (w === 0) return;
+      const scale = w / 140;
+      const svgTop = svg.getBoundingClientRect().top;
+      const heads = [...document.querySelectorAll('.topic h2')];
+      ys = quests.map((_, i) => {
+        const h = heads[i];
+        if (!h) return ys[i] || top + 40 * (i + 1);
+        const r = h.getBoundingClientRect();
+        return (r.top + r.height / 2 - svgTop) / scale;
+      });
+      quests.forEach((q, i) => q.setAttribute('transform', `translate(0 ${ys[i]})`));
+      const end = ys[ys.length - 1];
+      for (const el of [track, fill]) el.setAttribute('height', String(Math.max(0, end - top)));
+      svg.setAttribute('viewBox', `0 0 140 ${end + 40}`);
+      update();
     };
 
-    const tick = () => {
-      if (!alive) return;
+    // Die Leiste füllt sich bis zur Bildschirmmitte, erreichte Aufgaben werden abgehakt.
+    const update = () => {
+      if (!live) return;
+      const w = svg.getBoundingClientRect().width;
+      if (w === 0) return;
+      const scale = w / 140;
+      const p = (innerHeight * 0.55 - svg.getBoundingClientRect().top) / scale;
+      const end = ys[ys.length - 1];
+      fill.style.transform = `scaleY(${Math.min(1, Math.max(0, (p - top) / (end - top)))})`;
+      let done = 0;
+      quests.forEach((q, i) => {
+        const on = p >= ys[i];
+        q.classList.toggle('done', on);
+        if (on) done++;
+      });
+      levelEl.textContent = `Lv ${done + 1}`;
+    };
+
+    let queued = false;
+    const onScroll = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        update();
+      });
+    };
+
+    const hurt = () => {
+      if (!live) return;
       if (svg.getBoundingClientRect().width > 0) {
-        // Zwischendurch gibt es Erfahrung.
-        xp += rand(8, 18);
-        if (xp >= 100) {
-          xp = 0;
-          level += 1;
-          levelEl.textContent = `Lv ${level}`;
-          flash(bar, 700);
-          // Ein Level erledigt die nächste Aufgabe, danach beginnt die Liste von vorn.
-          const next = quests.find((q) => !q.classList.contains('done'));
-          if (next) next.classList.add('done');
-          else quests.forEach((q, i) => q.classList.toggle('done', i === 0));
-        }
-        setXp();
-        // Gelegentlich kostet ein Treffer ein Leben, beim letzten Leben gibt es Heilung.
-        if (Math.random() < 0.14) {
-          lives = lives > 1 ? lives - 1 : 3;
-          setHearts();
-        }
+        lives = lives > 1 ? lives - 1 : 3;
+        hearts.forEach((h, i) => h.classList.toggle('lost', i >= lives));
       }
-      timer = window.setTimeout(tick, rand(700, 1500));
+      timer = window.setTimeout(hurt, rand(2500, 6000));
     };
 
     const start = () => {
-      alive = true;
-      timer = window.setTimeout(tick, 900);
+      live = true;
+      document.documentElement.classList.add('js');
+      layout();
+      timer = window.setTimeout(hurt, 2500);
     };
+    const stop = () => {
+      live = false;
+      clearTimeout(timer);
+      document.documentElement.classList.remove('js');
+      fill.style.transform = '';
+      quests.forEach((q) => q.classList.add('done'));
+      levelEl.textContent = `Lv ${quests.length + 1}`;
+      hearts.forEach((h) => h.classList.remove('lost'));
+    };
+
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', layout);
+    addEventListener('load', layout);
+    new ResizeObserver(layout).observe(document.body);
     if (!reduce.matches) start();
-    reduce.addEventListener('change', () => {
-      if (reduce.matches) {
-        alive = false;
-        clearTimeout(timer);
-      } else if (!alive) start();
-    });
+    reduce.addEventListener('change', () => (reduce.matches ? stop() : start()));
   }
 </script>
