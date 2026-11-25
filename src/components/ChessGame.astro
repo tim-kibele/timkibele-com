@@ -6,8 +6,8 @@ import type { Lang } from '../i18n/ui';
 // und sucht nur bis Tiefe 6. In Testpartien gegen Stockfishs eigene Begrenzung auf 1320 lag das bei
 // ungefähr 1480 auf Stockfishs Skala (Suchtiefe statt fester Zeit, damit es nicht vom Gerät abhängt).
 // Es gibt kein Zeitlimit. Es werden keine Daten gesendet.
-interface Props { lang: Lang }
-const { lang } = Astro.props;
+interface Props { lang: Lang; boss?: boolean }
+const { lang, boss = false } = Astro.props;
 
 const text = {
   de: {
@@ -23,6 +23,8 @@ const text = {
     source: 'Engine: Stockfish.js (GPLv3)',
     noscript: 'Die Schachpartie braucht JavaScript.',
     pieces: { p: 'Bauer', n: 'Springer', b: 'Läufer', r: 'Turm', q: 'Dame', k: 'König' }, w: 'weißer', bl: 'schwarzer',
+    bossName: 'Timgnus Kibelsen', bossThinking: 'Timgnus denkt nach …',
+    bossText: 'Du bist ganz unten angekommen. Hier wartet Timgnus Kibelsen, Stockfish auf der höchsten Stufe.',
   },
   en: {
     bot: 'Stockfish (about 1200)', you: 'You',
@@ -37,10 +39,15 @@ const text = {
     source: 'Engine: Stockfish.js (GPLv3)',
     noscript: 'The chess game needs JavaScript.',
     pieces: { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' }, w: 'white', bl: 'black',
+    bossName: 'Timgnus Kibelsen', bossThinking: 'Timgnus is thinking …',
+    bossText: 'You made it all the way down. Timgnus Kibelsen is waiting here: Stockfish on its highest setting.',
   },
 }[lang];
+const labels = { ...text, bot: boss ? text.bossName : text.bot, thinking: boss ? text.bossThinking : text.thinking };
 ---
-<section class="chess" data-labels={JSON.stringify(text)}>
+<section class={boss ? 'chess boss' : 'chess'} data-labels={JSON.stringify(labels)} data-boss={boss ? '1' : undefined} hidden={boss}>
+  {boss && <h2 class="boss-title">{text.bossName}</h2>}
+  {boss && <p class="boss-text">{text.bossText}</p>}
   <form class="chess-setup">
     <label>{text.side}
       <select name="side"><option value="w">{text.white}</option><option value="b">{text.black}</option></select>
@@ -48,7 +55,7 @@ const text = {
     <button class="btn btn--primary" type="submit" data-start>{text.start}</button>
   </form>
 
-  <p class="chess-name" data-name="top">{text.bot}</p>
+  <p class="chess-name" data-name="top">{labels.bot}</p>
   <div class="chess-board" role="group" aria-label={text.board}></div>
   <p class="chess-name" data-name="bottom">{text.you}</p>
 
@@ -61,9 +68,51 @@ const text = {
 <script>
   import { Chess, type Square, type Move } from 'chess.js';
 
-  const root = document.querySelector<HTMLElement>('.chess');
-  if (root) {
+  const DEPTH = 6;
+
+  // ---- Engine (eine für alle Partien auf der Seite) ----
+  let worker: Worker | null = null;
+  let engineReady: Promise<void> | null = null;
+  let busy: Promise<unknown> = Promise.resolve();
+
+  const loadEngine = () =>
+    (engineReady ??= new Promise<void>((resolve, reject) => {
+      const w = new Worker('/stockfish/stockfish-19-lite-single.js');
+      worker = w;
+      w.onerror = () => { engineReady = null; worker = null; reject(new Error('engine')); };
+      const onMsg = (e: MessageEvent) => {
+        if (e.data === 'uciok') w.postMessage('isready');
+        else if (e.data === 'readyok') { w.removeEventListener('message', onMsg); resolve(); }
+      };
+      w.addEventListener('message', onMsg);
+      w.postMessage('uci');
+    }));
+
+  // Die normale Partie ist auf 1500 Elo und Suchtiefe 6 begrenzt, die Geheimpartie läuft mit voller Stärke.
+  // Die Optionen werden vor jedem Zug gesetzt, damit sich zwei Partien nicht in die Quere kommen.
+  const search = (moves: string[], boss: boolean) =>
+    new Promise<string>((resolve) => {
+      const w = worker!;
+      const onMsg = (e: MessageEvent) => {
+        const m = typeof e.data === 'string' ? e.data.match(/^bestmove (\S+)/) : null;
+        if (m) { w.removeEventListener('message', onMsg); resolve(m[1]); }
+      };
+      w.addEventListener('message', onMsg);
+      if (boss) {
+        w.postMessage('setoption name UCI_LimitStrength value false');
+        w.postMessage('setoption name Skill Level value 20');
+      } else {
+        w.postMessage('setoption name UCI_LimitStrength value true');
+        w.postMessage('setoption name UCI_Elo value 1500');
+      }
+      w.postMessage(`position startpos moves ${moves.join(' ')}`);
+      w.postMessage(boss ? 'go movetime 1500' : `go depth ${DEPTH}`);
+    });
+  const bestMove = (moves: string[], boss: boolean) => (busy = busy.then(() => search(moves, boss))) as Promise<string>;
+
+  const init = (root: HTMLElement) => {
     const L = JSON.parse(root.dataset.labels!);
+    const isBoss = root.dataset.boss === '1';
     const boardEl = root.querySelector<HTMLElement>('.chess-board')!;
     const form = root.querySelector<HTMLFormElement>('.chess-setup')!;
     const startBtn = root.querySelector<HTMLButtonElement>('[data-start]')!;
@@ -86,7 +135,6 @@ const text = {
     const pieceSvg = (type: string, color: string) =>
       `<svg class="piece piece--${color}" viewBox="0 0 45 45" aria-hidden="true" focusable="false">${shapes[type]}${feet}</svg>`;
 
-    const DEPTH = 6;
     const MIN_THINK = 500;
 
     let game = new Chess();
@@ -130,41 +178,6 @@ const text = {
       nameEl.bottom.textContent = L.you;
     };
 
-    // ---- Engine ----
-    let worker: Worker | null = null;
-    let engineReady: Promise<void> | null = null;
-
-    const loadEngine = () =>
-      (engineReady ??= new Promise<void>((resolve, reject) => {
-        const w = new Worker('/stockfish/stockfish-19-lite-single.js');
-        worker = w;
-        w.onerror = () => { engineReady = null; worker = null; reject(new Error('engine')); };
-        const onMsg = (e: MessageEvent) => {
-          if (e.data === 'uciok') {
-            w.postMessage('setoption name UCI_LimitStrength value true');
-            w.postMessage('setoption name UCI_Elo value 1500');
-            w.postMessage('isready');
-          } else if (e.data === 'readyok') {
-            w.removeEventListener('message', onMsg);
-            resolve();
-          }
-        };
-        w.addEventListener('message', onMsg);
-        w.postMessage('uci');
-      }));
-
-    const bestMove = (moves: string[]) =>
-      new Promise<string>((resolve) => {
-        const w = worker!;
-        const onMsg = (e: MessageEvent) => {
-          const m = typeof e.data === 'string' ? e.data.match(/^bestmove (\S+)/) : null;
-          if (m) { w.removeEventListener('message', onMsg); resolve(m[1]); }
-        };
-        w.addEventListener('message', onMsg);
-        w.postMessage(`position startpos moves ${moves.join(' ')}`);
-        w.postMessage(`go depth ${DEPTH}`);
-      });
-
     // ---- Ablauf ----
     const setStatus = (s: string) => { statusEl.textContent = s; };
 
@@ -201,7 +214,7 @@ const text = {
       setStatus(game.inCheck() ? `${L.check} ${L.thinking}` : L.thinking);
       const began = Date.now();
       const history = game.history({ verbose: true }).map((m) => m.from + m.to + (m.promotion ?? ''));
-      const uci = await bestMove(history);
+      const uci = await bestMove(history, isBoss);
       const wait = MIN_THINK - (Date.now() - began);
       if (wait > 0) await new Promise((r) => setTimeout(r, wait));
       if (id !== gameId || !playing) return;
@@ -268,5 +281,6 @@ const text = {
     form.addEventListener('submit', (e) => { e.preventDefault(); startGame(); });
     resignBtn.addEventListener('click', () => { if (playing) end(L.resigned, false); });
     renderBoard();
-  }
+  };
+  document.querySelectorAll<HTMLElement>('.chess').forEach(init);
 </script>

@@ -30,6 +30,8 @@ text:
     Schach spiele ich auch ab und zu, meine Elo liegt bei etwa 1200. Denkst du, du kannst mich schlagen? ;)
 
     ::chess
+
+    ::boss
   en: |-
     Video games are a welcome break from everyday life and one of my favourite art forms. I play many very different kinds of games.
 
@@ -56,4 +58,6 @@ text:
     I play chess every now and then too, and my rating is around 1200. Do you think you can beat me? ;)
 
     ::chess
+
+    ::boss
 ---

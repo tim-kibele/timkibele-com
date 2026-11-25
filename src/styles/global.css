@@ -222,6 +222,10 @@ h2 { margin-top: var(--space-2xl); }
 /* animation: game interface (Gaming page) */
 .gamepad .heart { fill: var(--color-accent); stroke: var(--color-accent); stroke-width: 0.8; transition: fill var(--dur-long) var(--ease-out), stroke var(--dur-long) var(--ease-out); }
 .gamepad .heart.lost { fill: none; stroke: var(--color-rule-2); }
+.gamepad .hearts-hit { fill: none; pointer-events: all; cursor: pointer; }
+.gamepad .boss-quest { display: none; }
+.gamepad .boss-quest.show { display: inline; }
+.gamepad .boss-quest .box { transform-box: fill-box; transform-origin: center; transform: rotate(45deg); }
 .gamepad .level { font-family: var(--font-body); font-size: 11px; fill: var(--color-muted); }
 .gamepad .xp-track { fill: var(--tint-moss); }
 .gamepad .xp-fill { fill: var(--color-accent); transform-box: fill-box; transform-origin: center top; }
@@ -247,3 +251,18 @@ h2 { margin-top: var(--space-2xl); }
 .js .keyboard .node.n0 { opacity: 1; transform: none; }
 .js .keyboard .bk { opacity: 0; transition: opacity var(--dur-short) var(--ease-out); }
 .js .keyboard .bk.in { opacity: 1; }
+
+/* easter egg 2: hidden chess game against Timgnus Kibelsen at the bottom of the gaming page */
+.boss { margin-top: var(--space-3xl); }
+.boss-title { margin: 0; font-size: var(--text-xl); }
+.boss-text { margin-top: var(--space-sm); }
+
+/* easter egg: "YOU DIED" screen on the gaming page (three clicks on the hearts) */
+.died { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; align-content: center; gap: var(--space-xl); background: transparent; color: var(--color-died); outline: none; transition: background-color 2400ms var(--ease-out); }
+.died.on { background: color-mix(in srgb, var(--color-void) 94%, transparent); }
+.died-text { margin: 0; width: 100%; padding-block: var(--space-xl); text-align: center; font: 400 clamp(3rem, 13vw, 9rem)/1 var(--font-display); letter-spacing: 0.04em; background: linear-gradient(to bottom, transparent, var(--color-void) 30%, var(--color-void) 70%, transparent); }
+.died-hint { margin: 0; font-size: var(--text-sm); color: var(--color-muted); }
+.js .died-text { opacity: 0; transform: scale(0.96); transition: opacity 2400ms var(--ease-out) 600ms, transform 9000ms linear 600ms; }
+.js .died.on .died-text { opacity: 1; transform: scale(1.05); }
+.js .died-hint { opacity: 0; transition: opacity 1500ms var(--ease-out); }
+.js .died-hint.on { opacity: 1; }

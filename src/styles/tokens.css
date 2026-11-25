@@ -19,6 +19,7 @@
   --color-muted: light-dark(color-mix(in srgb, var(--jade-ink) 86%, var(--jade-grey)), color-mix(in srgb, var(--jade-sage) 80%, var(--jade-grey)));
   --color-rule: light-dark(color-mix(in srgb, var(--jade-slate) 45%, var(--jade-grey)), color-mix(in srgb, var(--jade-slate) 40%, var(--paper-dark))); --color-rule-2: var(--jade-slate);
   --color-accent: light-dark(var(--jade-ink), var(--jade-sage)); --color-accent-2: var(--jade-sage); --color-accent-ink: light-dark(var(--jade-grey), var(--paper-dark));
+  --color-void: #0b0e0a; --color-died: #9b2b27;
   --color-focus: var(--color-accent); --tint-moss: light-dark(color-mix(in srgb, var(--jade-moss) 24%, transparent), color-mix(in srgb, var(--jade-moss) 30%, transparent));
   --color-band: var(--jade-ink); --color-band-ink: var(--jade-grey);
   --font-display: "Vollkorn", ui-serif, Georgia, serif; --font-body: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
