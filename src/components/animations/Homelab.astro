@@ -1,0 +1,117 @@
+---
+// Dekorative Animation für die Projektseite "Homelab und Self-Hosting". Zwei Ketten untereinander:
+// oben der Weg einer Anfrage zu n8n (Internet, Caddy als Reverse Proxy, n8n), unten das Backup
+// (Docker-Dienste auf dem Laptop, das nächtliche Archiv, der PC, der es abholt).
+// Die Struktur ist festes SVG (sichtbar ohne JavaScript und bei "Bewegung reduzieren"), das Skript schickt
+// nur abwechselnd einen Punkt durch die beiden Ketten. Die Knoten- und Kantenstile teilt sie mit der Workflow-Animation.
+const S = 20; // halbe Kantenlänge eines Knotens
+const nodes = [
+  { id: 'A', x: 70, y: 80, icon: 'globe' },
+  { id: 'B', x: 70, y: 200, icon: 'lock' },
+  { id: 'C', x: 70, y: 320, icon: 'flow' },
+  { id: 'D', x: 70, y: 450, icon: 'box' },
+  { id: 'E', x: 70, y: 570, icon: 'archive' },
+  { id: 'F', x: 70, y: 690, icon: 'screen' },
+];
+const links = ['A-B', 'B-C', 'D-E', 'E-F'];
+const by = Object.fromEntries(nodes.map((n) => [n.id, n]));
+const edges = links.map((key) => {
+  const [a, b] = key.split('-').map((id) => by[id]);
+  return { key, d: `M${a.x} ${a.y + S} L${b.x} ${b.y - S}` };
+});
+const icons: Record<string, string> = {
+  globe: '<circle cx="0" cy="0" r="7"/><ellipse cx="0" cy="0" rx="3" ry="7"/><path d="M-7 0 H7"/>',
+  lock: '<rect x="-5" y="-1" width="10" height="8" rx="1.5"/><path d="M-3 -1 V-4 A3 3 0 0 1 3 -4 V-1"/>',
+  flow: '<path d="M-7 0 H-2 M-2 0 L6 -6 M-2 0 L6 6"/><circle class="dot" cx="7" cy="-6" r="1.4"/><circle class="dot" cx="7" cy="6" r="1.4"/>',
+  box: '<path d="M-7 -3 L0 -7 L7 -3 V4 L0 8 L-7 4 Z M-7 -3 L0 1 L7 -3 M0 1 V8"/>',
+  archive: '<rect x="-7" y="-7" width="14" height="4" rx="1"/><path d="M-6 -3 V6 H6 V-3 M-2 1 H2"/>',
+  screen: '<rect x="-8" y="-6" width="16" height="10" rx="1.5"/><path d="M-3 8 H3 M0 4 V8"/>',
+};
+---
+<svg class="margin-art workflow homelab" viewBox="0 0 140 780" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+  <g>
+    {edges.map((e) => <path class="edge" data-e={e.key} d={e.d} />)}
+  </g>
+  <g>
+    {nodes.map((n) => (
+      <g class="wf-node" data-n={n.id} transform={`translate(${n.x} ${n.y})`}>
+        <rect x={-S} y={-S} width={S * 2} height={S * 2} rx="8" />
+        <g class="wf-icon" transform="scale(1.2)" set:html={icons[n.icon]} />
+      </g>
+    ))}
+  </g>
+  <g class="pulses"></g>
+</svg>
+
+<script>
+  const svg = document.querySelector<SVGSVGElement>('.homelab');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  if (svg && !reduce.matches) {
+    const nodeEl: Record<string, Element> = {};
+    const edgeEl: Record<string, SVGPathElement> = {};
+    svg.querySelectorAll('[data-n]').forEach((n) => (nodeEl[(n as SVGElement).dataset.n!] = n));
+    svg.querySelectorAll<SVGPathElement>('[data-e]').forEach((e) => (edgeEl[e.dataset.e!] = e));
+    const layer = svg.querySelector('.pulses')!;
+    const chains = [['A', 'B', 'C'], ['D', 'E', 'F']];
+
+    const flash = (el: Element) => {
+      el.classList.add('on');
+      setTimeout(() => el.classList.remove('on'), 1100);
+    };
+
+    let run: { path: string[]; i: number; start: number; el: SVGCircleElement } | null = null;
+    let nextRun = 0;
+    let turn = 0;
+    let raf = 0;
+
+    const frame = (now: number) => {
+      if (!run) {
+        if (now >= nextRun && svg.getBoundingClientRect().width > 0) {
+          const el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          el.setAttribute('r', '3.6');
+          el.setAttribute('class', 'pulse');
+          layer.appendChild(el);
+          run = { path: chains[turn++ % chains.length], i: -1, start: now, el };
+        }
+      } else {
+        const { path } = run;
+        if (run.i < 0) {
+          flash(nodeEl[path[0]]);
+          run.i = 0;
+          run.start = now;
+          flash(edgeEl[`${path[0]}-${path[1]}`]);
+        }
+        const edge = edgeEl[`${path[run.i]}-${path[run.i + 1]}`];
+        const len = edge.getTotalLength();
+        const dur = Math.min(1100, Math.max(450, len / 0.18));
+        const t = (now - run.start) / dur;
+        if (t >= 1) {
+          flash(nodeEl[path[run.i + 1]]);
+          run.i += 1;
+          run.start = now;
+          if (run.i >= path.length - 1) {
+            run.el.remove();
+            run = null;
+            nextRun = now + 900;
+          } else {
+            flash(edgeEl[`${path[run.i]}-${path[run.i + 1]}`]);
+          }
+        } else {
+          const p = edge.getPointAtLength(t * len);
+          run.el.setAttribute('transform', `translate(${p.x} ${p.y})`);
+        }
+      }
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    reduce.addEventListener('change', () => {
+      if (reduce.matches) {
+        cancelAnimationFrame(raf);
+        run?.el.remove();
+        run = null;
+      } else {
+        raf = requestAnimationFrame(frame);
+      }
+    });
+  }
+</script>

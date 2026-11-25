@@ -23,7 +23,7 @@ const projects = defineCollection({
     tags: z.array(z.string()).default([]),
     year: z.number(),
     // Kleine Animation am rechten Rand der Projektseite, Namen siehe src/components/animations/index.ts
-    animation: z.enum(['neural-net', 'workflow', 'scan', 'pebbles']).optional(),
+    animation: z.enum(['neural-net', 'workflow', 'scan', 'pebbles', 'homelab']).optional(),
     detail: z.object({ de: detail, en: detail }).optional(),
     featured: z.boolean().default(false),
   }),
