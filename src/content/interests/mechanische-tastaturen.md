@@ -37,7 +37,11 @@ text:
     - Case: Keychron Q5
     - Switches: Huano Sakura V2
     - Plate: Polycarbonat
-    - Keycaps: Black-on-White-Keycaps von der Tofu60
+    - Keycaps: Black-on-White-Keycaps
+
+    ## Tippduell
+
+    ::race
   en: |-
     Mechanical keyboards have been my hobby for about four years. I found it through YouTube videos: the keyboards sounded so good that I wanted one too. By now I have built three myself.
 
@@ -72,5 +76,9 @@ text:
     - Case: Keychron Q5
     - Switches: Huano Sakura V2
     - Plate: polycarbonate
-    - Keycaps: black-on-white keycaps from the Tofu60
+    - Keycaps: black-on-white keycaps
+
+    ## Typing race
+
+    ::race
 ---

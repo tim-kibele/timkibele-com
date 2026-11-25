@@ -1,0 +1,200 @@
+---
+import type { Lang } from '../i18n/ui';
+
+// Tippduell gegen einen Bot, der gleichmäßig mit 95 WPM schreibt.
+// Der Text kommt aus einer festen Liste, der Bot ist reine Simulation im Browser.
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const text = {
+  de: {
+    you: 'Du', bot: 'Tim (Bot)', wpm: 'WPM',
+    start: 'Rennen starten', again: 'Nochmal', go: 'Los!',
+    idle: 'Drücke auf Start. Nach dem Countdown erscheint der Text.',
+    placeholder: 'Hier tippen',
+    win: 'Du warst schneller.', lose: 'Tim war schneller.',
+    noscript: 'Das Tippduell braucht JavaScript.',
+  },
+  en: {
+    you: 'You', bot: 'Tim (bot)', wpm: 'WPM',
+    start: 'Start the race', again: 'Again', go: 'Go!',
+    idle: 'Press start. The text appears after the countdown.',
+    placeholder: 'Type here',
+    win: 'You were faster.', lose: 'Tim was faster.',
+    noscript: 'The typing race needs JavaScript.',
+  },
+}[lang];
+
+const passages = {
+  de: [
+    'Eine mechanische Tastatur besteht aus Case, Plate, Switches und Keycaps. Jeder Teil verändert den Klang, und erst zusammen entsteht der Sound, den man am Ende hört.',
+    'Beim Tippen auf einer guten Tastatur hört man jeden Anschlag. Manche mögen es leise und weich, andere laut und klackend, und über den richtigen Klang lässt sich lange streiten.',
+    'Ein Rennen wird auf den letzten Metern entschieden. Wer jetzt ruhig bleibt und keine Fehler macht, schlägt am Ende den Gegner, auch wenn er zwischendurch zurücklag.',
+  ],
+  en: [
+    'A mechanical keyboard is made of a case, a plate, switches and keycaps. Each part changes the sound, and only together do they make the sound you finally hear.',
+    'Typing on a good keyboard, you can hear every keystroke. Some people like it quiet and soft, others loud and clacky, and you can argue about the right sound for hours.',
+    'A race is decided in the final stretch. Whoever stays calm and makes no mistakes beats the opponent in the end, even after falling behind for a while.',
+  ],
+}[lang];
+const labels = { you: text.you, bot: text.bot, wpm: text.wpm, win: text.win, lose: text.lose, go: text.go, idle: text.idle, start: text.start, again: text.again };
+const resultTemplate = lang === 'de' ? 'Du: {me} WPM, Tim: {bot} WPM, Fehler: {m}.' : 'You: {me} WPM, Tim: {bot} WPM, mistakes: {m}.';
+---
+<section class="race" data-passages={JSON.stringify(passages)} data-labels={JSON.stringify(labels)} data-result={resultTemplate}>
+  <div class="race-lane">
+    <span class="race-name">{text.you}</span>
+    <div class="race-track"><div class="race-fill" data-fill="you"></div></div>
+    <span class="race-wpm"><span data-wpm="you">0</span> {text.wpm}</span>
+  </div>
+  <div class="race-lane">
+    <span class="race-name">{text.bot}</span>
+    <div class="race-track"><div class="race-fill race-fill--bot" data-fill="bot"></div></div>
+    <span class="race-wpm"><span data-wpm="bot">0</span> {text.wpm}</span>
+  </div>
+  <p class="race-text"></p>
+  <input class="race-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder={text.placeholder} aria-label={text.placeholder} disabled />
+  <div class="race-actions"><button class="btn btn--primary" type="button" data-start>{text.start}</button></div>
+  <p class="race-status" aria-live="polite">{text.idle}</p>
+  <noscript><p>{text.noscript}</p></noscript>
+</section>
+
+<script>
+  const root = document.querySelector<HTMLElement>('.race');
+  if (root) {
+    const passages: string[] = JSON.parse(root.dataset.passages!);
+    const L = JSON.parse(root.dataset.labels!);
+    const resultTemplate = root.dataset.result!;
+    const textEl = root.querySelector<HTMLElement>('.race-text')!;
+    const input = root.querySelector<HTMLInputElement>('.race-input')!;
+    const button = root.querySelector<HTMLButtonElement>('[data-start]')!;
+    const status = root.querySelector<HTMLElement>('.race-status')!;
+    const fill = { you: root.querySelector<HTMLElement>('[data-fill="you"]')!, bot: root.querySelector<HTMLElement>('[data-fill="bot"]')! };
+    const wpmEl = { you: root.querySelector<HTMLElement>('[data-wpm="you"]')!, bot: root.querySelector<HTMLElement>('[data-wpm="bot"]')! };
+
+    let passage = '';
+    let lastIndex = -1;
+    let running = false;
+    let startedAt = 0;
+    let raf = 0;
+    let timers: number[] = [];
+    let mistakes = 0;
+    let prevTyped = '';
+    let youDone = 0;
+    let youChars = 0;
+    let botDone = 0;
+    const BOT_WPM = 95;
+    let botChars = 0;
+    let lastFrame = 0;
+
+    const span = (cls: string, txt: string) => {
+      const s = document.createElement('span');
+      if (cls) s.className = cls;
+      s.textContent = txt;
+      return s;
+    };
+    const correctPrefix = (typed: string) => {
+      let ok = 0;
+      while (ok < typed.length && ok < passage.length && typed[ok] === passage[ok]) ok++;
+      return ok;
+    };
+    const render = (typed: string) => {
+      const ok = correctPrefix(typed);
+      const bad = Math.min(typed.length, passage.length) - ok;
+      const parts: Node[] = [];
+      if (ok) parts.push(span('race-ok', passage.slice(0, ok)));
+      if (bad > 0) parts.push(span('race-bad', passage.slice(ok, ok + bad)));
+      const restStart = ok + Math.max(bad, 0);
+      if (restStart < passage.length) {
+        parts.push(span('race-next', passage[restStart]));
+        parts.push(document.createTextNode(passage.slice(restStart + 1)));
+      }
+      textEl.replaceChildren(...parts);
+      return ok;
+    };
+    const wpm = (chars: number, ms: number) => (ms > 0 ? Math.round(chars / 5 / (ms / 60000)) : 0);
+    const clearTimers = () => { timers.forEach(clearTimeout); timers = []; cancelAnimationFrame(raf); };
+
+    const finish = (youFinished: boolean) => {
+      if (!running) return;
+      running = false;
+      clearTimers();
+      input.disabled = true;
+      const now = performance.now();
+      const meWpm = youFinished ? wpm(passage.length, youDone - startedAt) : wpm(youChars, now - startedAt);
+      const botWpm = botDone ? wpm(passage.length, botDone - startedAt) : wpm(botChars, now - startedAt);
+      status.textContent = `${youFinished ? L.win : L.lose} ${resultTemplate.replace('{me}', String(meWpm)).replace('{bot}', String(botWpm)).replace('{m}', String(mistakes))}`;
+      wpmEl.you.textContent = String(meWpm);
+      wpmEl.bot.textContent = String(botWpm);
+      button.textContent = L.again;
+      button.hidden = false;
+    };
+
+    const frame = (now: number) => {
+      if (!running) return;
+      const dt = Math.min(now - lastFrame, 100);
+      lastFrame = now;
+      botChars += ((BOT_WPM * 5) / 60000) * dt;
+      if (botChars >= passage.length) {
+        botChars = passage.length;
+        botDone = now;
+      }
+      fill.bot.style.transform = `scaleX(${botChars / passage.length})`;
+      wpmEl.bot.textContent = String(wpm(botChars, now - startedAt));
+      if (botDone) finish(false);
+      else raf = requestAnimationFrame(frame);
+    };
+
+    input.addEventListener('paste', (e) => e.preventDefault());
+    input.addEventListener('input', () => {
+      if (!running) return;
+      const typed = input.value;
+      const prevOk = correctPrefix(prevTyped);
+      const ok = render(typed);
+      // Ein Fehler zählt, wenn nach einem fehlerfreien Stand ein falsches Zeichen dazukommt.
+      if (typed.length > prevTyped.length && ok < typed.length && prevOk === prevTyped.length) mistakes++;
+      prevTyped = typed;
+      youChars = ok;
+      const now = performance.now();
+      fill.you.style.transform = `scaleX(${ok / passage.length})`;
+      wpmEl.you.textContent = String(wpm(ok, now - startedAt));
+      if (typed === passage) {
+        youDone = now;
+        finish(true);
+      }
+    });
+
+    const begin = () => {
+      running = true;
+      input.disabled = false;
+      input.maxLength = passage.length + 5;
+      input.focus();
+      startedAt = performance.now();
+      lastFrame = startedAt;
+      raf = requestAnimationFrame(frame);
+    };
+
+    button.addEventListener('click', () => {
+      clearTimers();
+      let i = Math.floor(Math.random() * passages.length);
+      if (i === lastIndex) i = (i + 1) % passages.length;
+      lastIndex = i;
+      passage = passages[i];
+      mistakes = 0; prevTyped = ''; youDone = 0; youChars = 0; botDone = 0; botChars = 0;
+      input.value = '';
+      input.disabled = true;
+      textEl.textContent = '';
+      fill.you.style.transform = 'scaleX(0)';
+      fill.bot.style.transform = 'scaleX(0)';
+      wpmEl.you.textContent = '0';
+      wpmEl.bot.textContent = '0';
+      button.hidden = true;
+      // Countdown 3, 2, 1, Los
+      ['3', '2', '1'].forEach((n, k) => timers.push(window.setTimeout(() => (status.textContent = n), k * 800)));
+      timers.push(window.setTimeout(() => {
+        status.textContent = L.go;
+        render('');
+        begin();
+      }, 2400));
+    });
+  }
+</script>
