@@ -14,9 +14,12 @@ const { item } = Astro.props;
 const tr = t(lang);
 const title = item.data.title[lang];
 const Animation = item.data.animation ? animations[item.data.animation] : null;
-// Blöcke im Textfeld, getrennt durch Leerzeilen: "## Titel" ist eine Überschrift, Zeilen mit "- " eine Liste.
+// Blöcke im Textfeld, getrennt durch Leerzeilen: "## Titel" ist eine Überschrift, Zeilen mit "- " eine Liste,
+// "::slot image Text" oder "::slot audio Text" ein Platzhalter für ein Bild oder einen Soundtest.
 const blocks = (item.data.text?.[lang] ?? tr.interests.note).split(/\n\s*\n/).map((b) => {
   if (b.startsWith('## ')) return { heading: b.slice(3) };
+  const slot = b.match(/^::slot (image|audio) (.+)$/);
+  if (slot) return { slot: slot[2], kind: slot[1] };
   const lines = b.split('\n');
   if (lines.every((l) => l.startsWith('- '))) return { list: lines.map((l) => l.slice(2)) };
   return { text: b };
@@ -30,6 +33,7 @@ const firstText = blocks.findIndex((b) => 'text' in b);
     <h1>{title}</h1>
     {blocks.map((b, i) =>
       'heading' in b ? <h2>{b.heading}</h2>
+      : 'slot' in b ? <div class={`slot slot--${b.kind}`}><span>{b.slot}</span></div>
       : 'list' in b ? <ul>{b.list.map((li) => <li>{li}</li>)}</ul>
       : <p class={i === firstText ? 'lead' : undefined}>{b.text}</p>
     )}

@@ -53,6 +53,10 @@ h2 { margin-top: var(--space-2xl); }
 .topic h2 { margin-top: var(--space-xl); margin-bottom: var(--space-sm); font-size: var(--text-xl); }
 .topic ul { margin: var(--space-sm) 0 0; padding-left: 1.2em; max-width: 60ch; font-size: var(--text-lg); line-height: 1.7; }
 .topic li + li { margin-top: var(--space-2xs); }
+.topic .slot { display: grid; place-items: center; max-width: 60ch; margin-top: var(--space-md); border: var(--rule-hair) dashed var(--color-rule-2); border-radius: var(--radius-card); background: var(--color-paper-2); color: var(--color-muted); font-size: var(--text-sm); }
+.topic .slot--image { aspect-ratio: 16 / 9; }
+.topic .slot--audio { min-height: 3.5rem; }
+.topic h2 + .slot { margin-top: var(--space-md); }
 .topic h2 + p { margin-top: var(--space-sm); }
 .topic p + p { margin-top: var(--space-lg); }
 
