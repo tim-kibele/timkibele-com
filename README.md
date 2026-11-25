@@ -8,7 +8,7 @@ Persönliche Profilseite von Tim Kibele, online unter [www.timkibele.com](https:
 - **Projekte:** Einträge mit Beschreibung, Stack, Code-Link und einer Animation zum jeweiligen Thema
 - **Interessen:** KI, Gaming, mechanische Tastaturen und weitere. Die Seiten haben eine große Animation neben dem Text. Auf der Gaming-Seite gibt es eine Schachpartie gegen Stockfish, auf der Tastaturen-Seite ein Tippduell
 - **Lebenslauf:** Berufserfahrung, Ausbildung, Technologien
-- **Erfolge:** Übersicht der Easter Eggs, die auf der Seite versteckt sind. Gefundene stehen dort, für die anderen gibt es einen Tipp. Der Fortschritt bleibt im Browser (localStorage), nichts wird gesendet
+- **Geheimnisse:** Übersicht der Easter Eggs, die auf der Seite versteckt sind. Gefundene stehen dort, für die anderen gibt es einen Tipp. Der Fortschritt bleibt im Browser (localStorage), nichts wird gesendet
 - **Datenschutz**
 
 ## Technik
@@ -34,7 +34,7 @@ src/
 ├── i18n/               Oberflächentexte (de, en)
 ├── layouts/            Basislayout mit Kopfleiste und Fußzeile
 ├── pages/[lang]/       Seiten für beide Sprachen
-├── scripts/            Gemeinsamer Code (Erfolge freischalten)
+├── scripts/            Gemeinsamer Code (Easter Eggs freischalten)
 └── styles/             Tokens, Basis-CSS und globale Stile
 AGENTS.md               Regeln für Layout, Animationen und Easter Eggs
 ```

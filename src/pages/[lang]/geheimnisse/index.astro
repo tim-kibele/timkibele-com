@@ -10,7 +10,7 @@ const lang = Astro.params.lang as Lang;
 const tr = t(lang);
 const a = tr.achievements;
 ---
-<Base lang={lang} title={a.title} description={a.intro} path="erfolge/">
+<Base lang={lang} title={a.title} description={a.intro} path="geheimnisse/">
   <h1>{a.title}</h1>
   <p class="lead">{a.intro}</p>
   <p class="ach-count" aria-live="polite"><span data-count>0</span> {a.of} {eggs.length}</p>

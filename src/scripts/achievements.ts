@@ -4,8 +4,8 @@ import { eggs } from '../data/easter-eggs';
 const KEY = 'tk-easter-eggs';
 type Lang = 'de' | 'en';
 const label = {
-  de: { found: 'Easter Egg gefunden', link: 'Zu den Erfolgen' },
-  en: { found: 'Easter egg found', link: 'View achievements' },
+  de: { found: 'Easter Egg gefunden', link: 'Zu den Geheimnissen' },
+  en: { found: 'Easter egg found', link: 'View secrets' },
 };
 
 export const read = (): Record<string, string> => {
@@ -33,7 +33,7 @@ const toast = (id: string) => {
   text.className = 'toast-text';
   text.textContent = `${label[lang].found}: ${egg.title[lang]}`;
   const link = document.createElement('a');
-  link.href = `/${lang}/erfolge/`;
+  link.href = `/${lang}/geheimnisse/`;
   link.textContent = label[lang].link;
   el.append(text, link);
   document.body.append(el);

@@ -1,5 +1,5 @@
 // Alle Easter Eggs der Seite. Jedes neue Easter Egg wird hier eingetragen und ruft beim Finden
-// `unlock('<id>')` aus `src/scripts/achievements.ts` auf. Die Erfolge-Seite und das Pop-up lesen von hier.
+// `unlock('<id>')` aus `src/scripts/achievements.ts` auf. Die Geheimnisse-Seite und das Pop-up lesen von hier.
 // `path` ist die Seite, auf der das Easter Egg versteckt ist (ohne Sprache), `page` ihr Name für den Tipp.
 // `hint` ist ein vager Hinweis ohne die Lösung zu verraten. `found` beschreibt, was man getan hat.
 export type L10n = { de: string; en: string };
