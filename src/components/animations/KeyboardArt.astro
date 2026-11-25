@@ -1,134 +1,176 @@
 ---
-// Dekorative Animation für die Tastaturen-Seite: der Zusammenbau als Schleife. Ein Switch wird
-// geschmiert (Tropfen), die Switches kommen in die Platte, die Keycaps werden aufgesetzt, zum Schluss
-// wird auf der fertigen Tastatur getippt. Das Tastenlayout ist ein allgemeines 60-%-Muster und sagt
-// nichts über die echten Tastaturen aus.
-// Die Struktur ist festes SVG und zeigt die fertige Tastatur (sichtbar ohne JavaScript und bei
-// "Bewegung reduzieren"); das Skript spielt den Aufbau darüber ab.
-const U = 8.8; // Breite einer Taste in Einheiten
-const rows = [
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-  [1.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1.5],
-  [1.75, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2.25],
-  [2.25, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2.75],
-  [1.25, 1.25, 1.25, 6.25, 1.25, 1.25, 1.25, 1.25],
-];
-const y0 = 160;
-const keys: { x: number; y: number; w: number; row: number }[] = [];
-rows.forEach((row, r) => {
-  let x = 4;
-  row.forEach((w) => {
-    keys.push({ x, y: y0 + r * U, w: w * U - 1.2, row: r });
-    x += w * U;
+// Dekorative Animation für die Tastaturen-Seite: ein Zeitstrahl durch das Hobby. Eine Linie wächst nach
+// unten, erst ein Startpunkt (Beginn des Hobbys), dann drei Tastaturen, die nacheinander erscheinen und
+// sich mit Tasten füllen. Die Tastaturen stehen auf Höhe der Bilder der jeweiligen Aufbauten im Text (das
+// Skript misst die Bildplätze) und haben die Größen 60 %, TKL und 96 %. Die Keycaps spiegeln die Angaben
+// im Text: die erste hat derzeit keine Caps (nur die Switches sind zu sehen), die zweite schwarze
+// Blank-Keycaps, die dritte Black-on-White-Keycaps. Die Linie endet bei der dritten Tastatur.
+// Es gibt keine Jahreszahlen.
+// Die Struktur ist festes SVG und zeigt den fertigen Zustand (sichtbar ohne JavaScript und bei
+// "Bewegung reduzieren"); das Skript richtet die Tastaturen aus und baut den Zeitstrahl auf.
+const U = 5.4; // Breite einer Taste in Einheiten
+const X0 = 25; // linker Rand der Tastaturen
+const ones = (n: number) => Array(n).fill(1);
+const bottom = [1.25, 1.25, 1.25, 6.25, 1.25, 1.25, 1.25, 1.25];
+// Zeilen als Folge von Tastenbreiten; negative Zahlen sind Lücken
+const layouts = {
+  '60': [
+    [...ones(13), 2],
+    [1.5, ...ones(12), 1.5],
+    [1.75, ...ones(11), 2.25],
+    [2.25, ...ones(10), 2.75],
+    bottom,
+  ],
+  tkl: [
+    [1, -1, ...ones(4), -0.5, ...ones(4), -0.5, ...ones(4), -0.25, ...ones(3)],
+    [...ones(13), 2, -0.25, ...ones(3)],
+    [1.5, ...ones(12), 1.5, -0.25, ...ones(3)],
+    [1.75, ...ones(11), 2.25],
+    [2.25, ...ones(10), 2.75, -0.25, -1, 1],
+    [...bottom, -0.25, ...ones(3)],
+  ],
+  '96': [
+    [1, ...ones(12), 1, 1, -0.25, 1, -0.25, ...ones(4)],
+    [...ones(13), 2, -0.25, 1, -0.25, ...ones(4)],
+    [1.5, ...ones(12), 1.5, -0.25, 1, -0.25, ...ones(4)],
+    [1.75, ...ones(11), 2.25, -0.25, 1, -0.25, ...ones(4)],
+    [2.25, ...ones(10), 2.75, -0.25, 1, -0.25, ...ones(4)],
+    [...bottom, -0.25, 1, -0.25, 2, 1, 1],
+  ],
+};
+const staticMids = [120, 250, 380]; // Lage ohne JavaScript
+const specs = ([['60', 'none'], ['tkl', 'dark'], ['96', 'light']] as const).map(([layout, caps], i) => {
+  const rows = layouts[layout];
+  const keys: { x: number; y: number; w: number }[] = [];
+  let width = 0;
+  rows.forEach((row, r) => {
+    let x = X0;
+    const y = r * U + (r > 0 && rows.length === 6 ? U * 0.5 : 0); // kleine Lücke unter der F-Reihe
+    row.forEach((w) => {
+      if (w > 0) keys.push({ x, y, w: w * U - 1 });
+      x += Math.abs(w) * U;
+    });
+    width = Math.max(width, x - X0);
   });
+  const height = (rows.length + (rows.length === 6 ? 0.5 : 0)) * U;
+  return { caps, keys, width, height, shift: staticMids[i] - height / 2 };
 });
-const h = U - 1.2;
+const h = U - 1;
+const startY = 30;
+const endY = staticMids[2];
 ---
-<svg class="margin-art keyboard" viewBox="0 0 140 260" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-  <g class="lube">
-    <rect class="housing" x="42" y="40" width="56" height="56" rx="6" />
-    <g class="stem">
-      <rect x="66" y="58" width="8" height="20" rx="1.5" />
-      <rect x="60" y="64" width="20" height="8" rx="1.5" />
+<svg class="margin-art keyboard" viewBox={`0 0 140 ${endY + 40}`} preserveAspectRatio="xMidYMin meet" aria-hidden="true" focusable="false">
+  <path class="line" d={`M14 ${startY} V${endY}`} pathLength="1" />
+  <g class="place start" transform={`translate(0 ${startY})`}>
+    <g class="node n0">
+      <circle class="dot big" cx="14" cy="0" r="5.5" />
     </g>
-    <circle class="drop" cx="70" cy="16" r="4" />
   </g>
-
-  <rect class="plate" x="1" y={y0 - 3} width="138" height={rows.length * U + 5} rx="4" />
-  {keys.map((k) => (
-    <g class="k" data-row={k.row}>
-      <rect class="hole" x={k.x} y={k.y} width={k.w} height={h} rx="1.4" />
-      <rect class="sw" x={k.x + k.w / 2 - 2.6} y={k.y + h / 2 - 2.6} width="5.2" height="5.2" rx="1" />
-      <rect class="cap" x={k.x} y={k.y} width={k.w} height={h} rx="1.4" />
+  {specs.map((s, i) => (
+    <g class="place" data-h={s.height} transform={`translate(0 ${s.shift})`}>
+      <g class={`node n${i + 1}`}>
+        <circle class="dot" cx="14" cy={s.height / 2} r="3.8" />
+        <line class="tick" x1="18" y1={s.height / 2} x2={X0 - 3} y2={s.height / 2} />
+        <rect class="plate" x={X0 - 3} y="-3" width={s.width + 6} height={s.height + 6} rx="3.5" />
+        {s.keys.map((k) => (
+          <g class="bk">
+            <rect class="sw" x={k.x + k.w / 2 - 1.8} y={k.y + h / 2 - 1.8} width="3.6" height="3.6" rx="0.8" />
+            {s.caps !== 'none' && <rect class={`cap cap--${s.caps}`} x={k.x} y={k.y} width={k.w} height={h} rx="1" />}
+            {s.caps === 'light' && <rect class="legend" x={k.x + k.w / 2 - 0.8} y={k.y + h / 2 - 0.8} width="1.6" height="1.6" rx="0.4" />}
+          </g>
+        ))}
+      </g>
     </g>
   ))}
-
-  <g class="steps">
-    {[0, 1, 2, 3].map((i) => <circle class="step" cx={49 + i * 14} cy="236" r="2.6" />)}
-  </g>
 </svg>
 
 <script>
   const svg = document.querySelector<SVGSVGElement>('.keyboard');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   if (svg) {
-    const big = svg.querySelector<SVGGElement>('.lube')!;
-    const drop = svg.querySelector<SVGElement>('.drop')!;
-    const steps = [...svg.querySelectorAll<SVGElement>('.step')];
-    const keys = [...svg.querySelectorAll<SVGGElement>('.k')];
+    const line = svg.querySelector<SVGPathElement>('.line')!;
+    const places = [...svg.querySelectorAll<SVGGElement>('.place')]; // 0: Startpunkt, 1 bis 3: Tastaturen
+    const nodes = [...svg.querySelectorAll<SVGGElement>('.node')];
     const wait = (ms: number) => new Promise<void>((res) => setTimeout(res, ms));
-    const rand = (a: number, b: number) => a + Math.random() * (b - a);
     let alive = false;
+    let ys = places.map(() => 0); // Mitte jedes Punkts im Bild, in Einheiten
+    let ready = false;
 
-    const setStep = (n: number) => steps.forEach((s, i) => s.classList.toggle('on', i <= n));
+    // Startpunkt auf Höhe der Einleitung, jede Tastatur mittig neben dem Bild ihres Aufbaus
+    const layout = () => {
+      const w = svg.getBoundingClientRect().width;
+      if (w === 0) return;
+      const scale = w / 140;
+      const top = svg.getBoundingClientRect().top;
+      const mid = (el: Element | undefined, fallback: number) => {
+        if (!el) return fallback;
+        const r = el.getBoundingClientRect();
+        return (r.top + r.height / 2 - top) / scale;
+      };
+      const lead = document.querySelector('.topic .lead');
+      const images = [...document.querySelectorAll('.topic .slot--image')];
+      ys = places.map((_, i) => (i === 0 ? mid(lead ?? undefined, 30) - (lead ? (lead.getBoundingClientRect().height / 2 - 14) / scale : 0) : mid(images[i - 1], ys[i] || 120 * i)));
+      places.forEach((p, i) => {
+        const half = Number(p.dataset.h ?? 0) / 2;
+        p.setAttribute('transform', `translate(0 ${ys[i] - half})`);
+      });
+      const end = ys[ys.length - 1];
+      line.setAttribute('d', `M14 ${ys[0]} V${end}`);
+      svg.setAttribute('viewBox', `0 0 140 ${end + 40}`);
+      ready = true;
+    };
+
+    const draw = (i: number) => line.style.setProperty('stroke-dashoffset', String(1 - (ys[i] - ys[0]) / (ys[ys.length - 1] - ys[0])));
     const reset = () => {
-      big.classList.remove('lubed');
-      keys.forEach((k) => k.classList.remove('in', 'capped', 'lit'));
-      setStep(-1);
+      line.style.setProperty('stroke-dashoffset', '1');
+      nodes.forEach((n) => {
+        n.classList.remove('in');
+        n.querySelectorAll('.bk').forEach((k) => k.classList.remove('in'));
+      });
     };
 
     const loop = async () => {
-      document.documentElement.classList.add('js');
       while (alive) {
-        if (svg.getBoundingClientRect().width === 0) {
+        if (svg.getBoundingClientRect().width === 0 || !ready) {
           await wait(1000);
           continue;
         }
         reset();
-        await wait(900);
-
-        // 1. Switch schmieren: drei Tropfen, danach glänzt der Schaft
-        setStep(0);
-        for (let i = 0; i < 3 && alive; i++) {
-          drop.animate(
-            [{ transform: 'translateY(0)', opacity: 1 }, { transform: 'translateY(46px)', opacity: 1, offset: 0.8 }, { transform: 'translateY(50px)', opacity: 0 }],
-            { duration: 700, easing: 'ease-in' }
-          );
-          await wait(850);
-        }
-        big.classList.add('lubed');
-        await wait(1000);
-
-        // 2. Switches in die Platte setzen
-        setStep(1);
-        for (const k of keys) {
+        await wait(1200);
+        for (let i = 0; i < nodes.length; i++) {
           if (!alive) return;
-          k.classList.add('in');
-          await wait(24);
+          if (i > 0) {
+            draw(i);
+            await wait(900);
+          }
+          const n = nodes[i];
+          n.classList.add('in');
+          for (const k of n.querySelectorAll('.bk')) {
+            if (!alive) return;
+            k.classList.add('in');
+            await wait(14);
+          }
+          await wait(600);
         }
-        await wait(800);
-
-        // 3. Keycaps aufsetzen, Reihe für Reihe
-        setStep(2);
-        for (const k of keys) {
-          if (!alive) return;
-          k.classList.add('capped');
-          await wait(18);
-        }
-        await wait(900);
-
-        // 4. Auf der fertigen Tastatur tippen
-        setStep(3);
-        const presses = 12 + Math.floor(Math.random() * 6);
-        for (let i = 0; i < presses && alive; i++) {
-          const key = keys[Math.floor(Math.random() * keys.length)];
-          key.classList.add('lit');
-          setTimeout(() => key.classList.remove('lit'), 160);
-          await wait(rand(100, 230));
-        }
-        await wait(2200);
+        await wait(4200);
       }
     };
 
     const start = () => {
       alive = true;
+      document.documentElement.classList.add('js');
       loop();
     };
     const stop = () => {
       alive = false;
       document.documentElement.classList.remove('js');
-      reset();
+      line.style.removeProperty('stroke-dashoffset');
     };
+
+    layout();
+    addEventListener('load', layout);
+    addEventListener('resize', layout);
+    new ResizeObserver(layout).observe(document.body);
     if (!reduce.matches) start();
     reduce.addEventListener('change', () => {
       if (reduce.matches) stop();
