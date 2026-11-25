@@ -1,43 +1,63 @@
-# Astro Starter Kit: Minimal
+# timkibele.com
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Persönliche Profilseite von Tim Kibele, online unter [www.timkibele.com](https://www.timkibele.com). Die Seite zeigt Lebenslauf, Projekte und Interessen auf Deutsch und Englisch.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Inhalt
 
-## 🚀 Project Structure
+- **Start:** kurze Vorstellung
+- **Projekte:** Einträge mit Beschreibung, Stack, Code-Link und einer Animation zum jeweiligen Thema
+- **Interessen:** KI, Gaming, mechanische Tastaturen und weitere. Die Seiten haben eine große Animation neben dem Text. Auf der Gaming-Seite gibt es eine Schachpartie gegen Stockfish, auf der Tastaturen-Seite ein Tippduell
+- **Lebenslauf:** Berufserfahrung, Ausbildung, Technologien
+- **Erfolge:** Übersicht der Easter Eggs, die auf der Seite versteckt sind. Gefundene stehen dort, für die anderen gibt es einen Tipp. Der Fortschritt bleibt im Browser (localStorage), nichts wird gesendet
+- **Datenschutz**
 
-Inside of your Astro project, you'll see the following folders and files:
+## Technik
+
+- [Astro](https://astro.build) 7, vollständig statisch, ohne Frontend-Framework
+- Zwei Sprachen über die Routen `/de/…` und `/en/…`, Oberflächentexte in `src/i18n/ui.ts`
+- Inhalte als Markdown in Content Collections (`projects`, `interests`)
+- [chess.js](https://github.com/jhlywa/chess.js) für die Schachregeln, [Stockfish.js](https://github.com/nmrugg/stockfish.js) als Engine (läuft als Worker im Browser, Dateien in `public/stockfish/`)
+- Schriften über [Fontsource](https://fontsource.org) (Newsreader, Vollkorn, Hanken Grotesk), Hell- und Dunkelmodus
+- Hosting auf GitHub Pages, Deployment per GitHub Actions bei Push auf `main`
+
+## Projektstruktur
 
 ```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+public/                 Statische Dateien (CNAME, Favicon, Stockfish)
+src/
+├── components/         Seitenbausteine, Schachpartie, Tippduell
+│   └── animations/     Animationen für Projekt- und Interessenseiten
+├── content/
+│   ├── projects/       Ein Markdown-Eintrag pro Projekt
+│   └── interests/      Ein Markdown-Eintrag pro Interessenseite
+├── data/               Liste der Easter Eggs
+├── i18n/               Oberflächentexte (de, en)
+├── layouts/            Basislayout mit Kopfleiste und Fußzeile
+├── pages/[lang]/       Seiten für beide Sprachen
+├── scripts/            Gemeinsamer Code (Erfolge freischalten)
+└── styles/             Tokens, Basis-CSS und globale Stile
+AGENTS.md               Regeln für Layout, Animationen und Easter Eggs
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Befehle
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+Alle Befehle laufen im Hauptverzeichnis. Voraussetzung ist Node.js ab Version 22.23.4.
 
-Any static assets, like images, can be placed in the `public/` directory.
+| Befehl            | Aktion                                           |
+| :---------------- | :----------------------------------------------- |
+| `npm install`     | Installiert die Abhängigkeiten                   |
+| `npm run dev`     | Startet den Entwicklungsserver auf `localhost:4321` |
+| `npm run build`   | Baut die Seite nach `./dist/`                    |
+| `npm run preview` | Zeigt den Build lokal an                         |
 
-## 🧞 Commands
+## Inhalte pflegen
 
-All commands are run from the root of the project, from a terminal:
+- **Projekt:** `src/content/projects/<name>.md` mit Titel und Beschreibung je Sprache, Stack-Tags, Jahr und optional `repo`, `url` und `animation`
+- **Interessenseite:** `src/content/interests/<name>.md` mit dem Text je Sprache im Feld `text`. Abschnitte beginnen mit `##`, Listen mit `-`. Eine Schachpartie oder ein Tippduell lassen sich über `::chess` und `::race` einbinden
+- **Neues Easter Egg:** in `src/data/easter-eggs.ts` eintragen und beim Finden `unlock('<id>')` aufrufen (aus `src/scripts/achievements.ts`)
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Lizenzen von Drittcode
 
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- Stockfish.js steht unter der GPLv3. Die Lizenz liegt in `public/stockfish/Copying.txt`, die Seite verlinkt den Quellcode unter der Schachpartie
+- chess.js steht unter der BSD-Lizenz
+- Die Schriften stehen unter der SIL Open Font License
