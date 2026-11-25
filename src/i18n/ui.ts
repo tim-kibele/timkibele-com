@@ -9,7 +9,7 @@ export const ui = {
     home: {
       heading: 'Hallo, ich bin Tim.',
       intro: 'Hier zeige ich, woran ich arbeite und was ich dabei lerne.',
-      portrait: 'Foto folgt',
+      portraitAlt: 'Porträt von Tim Kibele: Er lächelt leicht, trägt einen hellen Hoodie und hat die Arme vor der Brust verschränkt.',
       more: 'Mehr von mir',
       cvNote: 'Mein Werdegang auf einen Blick.',
       closing: 'Schreib mir.',
@@ -39,7 +39,7 @@ export const ui = {
     home: {
       heading: "Hi, I'm Tim.",
       intro: 'Here I share what I work on and what I learn.',
-      portrait: 'Photo to come',
+      portraitAlt: 'Portrait of Tim Kibele: he smiles slightly, wears a light hoodie and has his arms crossed in front of his chest.',
       more: 'More about me',
       cvNote: 'My background at a glance.',
       closing: 'Get in touch.',

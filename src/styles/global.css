@@ -216,8 +216,7 @@ h2 { margin-top: var(--space-2xl); }
 .about .lead { margin-top: var(--space-lg); color: var(--color-ink-2); }
 .about .actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-xl); }
 .portrait { margin: 0; }
-.portrait [data-slot] { aspect-ratio: 4 / 5; border-radius: var(--radius-card); outline: var(--rule-hair) solid var(--color-rule); outline-offset: -1px; display: grid; place-items: end start; padding: var(--space-md); }
-.portrait figcaption, .portrait [data-slot] span { font: 400 var(--text-sm)/1.4 var(--font-outlier); color: var(--color-muted); }
+.portrait img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 20%; border-radius: var(--radius-card); outline: var(--rule-hair) solid var(--color-rule); outline-offset: -1px; }
 
 .more { margin-top: var(--space-3xl); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: var(--space-2xl); }
 .more h2 { margin-top: 0; font-size: var(--text-section); }
@@ -235,7 +234,7 @@ h2 { margin-top: var(--space-2xl); }
 @media (max-width: 48rem) {
   .about, .more { grid-template-columns: minmax(0, 1fr); gap: var(--space-xl); }
   .index a { grid-template-columns: minmax(0, 1fr); gap: var(--space-2xs); }
-  .portrait [data-slot] { aspect-ratio: 4 / 3; }
+  .portrait img { aspect-ratio: 4 / 3; }
 }
 
 /* animation: game interface (Gaming page) */
