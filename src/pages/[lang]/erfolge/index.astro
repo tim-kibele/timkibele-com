@@ -25,7 +25,7 @@ const a = tr.achievements;
         <div>
           <h2 class="ach-title"><span class="when-locked">???</span><span class="when-found">{e.title[lang]}</span></h2>
           <p class="when-found">{e.found[lang]}</p>
-          <p class="when-locked">{a.tip}: {a.hiddenOn} <a href={`/${lang}/${e.path}`}>{e.page[lang]}</a>.</p>
+          <p class="when-locked">{a.tip}: {a.hiddenOn} <a href={`/${lang}/${e.path}`}>{e.page[lang]}</a>. {e.hint[lang]}</p>
         </div>
       </li>
     ))}

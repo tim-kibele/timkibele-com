@@ -90,6 +90,7 @@ h2 { margin-top: var(--space-2xl); }
 .race-next { border-bottom: 2px solid var(--color-accent); }
 .race-input { display: block; width: 100%; box-sizing: border-box; margin-top: var(--space-md); padding: var(--space-sm) var(--space-md); font: inherit; color: var(--color-ink); background: var(--color-paper); border: var(--rule-hair) solid var(--color-rule-2); border-radius: var(--radius-card); }
 .race-input:focus-visible, .race .btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.race-input.race-error { opacity: 1; color: var(--color-error); border-color: var(--color-error); }
 .race-actions { margin-top: var(--space-md); }
 .race .btn { font: inherit; font-weight: 500; cursor: pointer; }
 .race-status { margin-top: var(--space-md); min-height: 1.6em; color: var(--color-ink); }

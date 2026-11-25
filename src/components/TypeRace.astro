@@ -2,6 +2,8 @@
 import type { Lang } from '../i18n/ui';
 
 // Tippduell gegen einen Bot, der gleichmäßig mit 95 WPM schreibt.
+// Easter Egg: Wer das Rennen startet und fünf Sekunden nach "Los!" nichts tippt, bekommt eine Fehlermeldung im
+// Textfeld, der Bot stürzt ab, und man gewinnt. Der Erfolg gilt für jeden Sieg, auch den ehrlichen.
 // Der Text kommt aus einer festen Liste, der Bot ist reine Simulation im Browser.
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -14,6 +16,7 @@ const text = {
     placeholder: 'Hier tippen',
     win: 'Du warst schneller.', lose: 'Tim war schneller.',
     noscript: 'Das Tippduell braucht JavaScript.',
+    error: 'Fehler: Keine Eingabe gefunden.', crash: 'Tim ist abgestürzt. Du hast gewonnen.',
   },
   en: {
     you: 'You', bot: 'Tim (bot)', wpm: 'WPM',
@@ -22,6 +25,7 @@ const text = {
     placeholder: 'Type here',
     win: 'You were faster.', lose: 'Tim was faster.',
     noscript: 'The typing race needs JavaScript.',
+    error: 'Error: no input found.', crash: 'Tim crashed. You win.',
   },
 }[lang];
 
@@ -37,7 +41,7 @@ const passages = {
     'A race is decided in the final stretch. Whoever stays calm and makes no mistakes beats the opponent in the end, even after falling behind for a while.',
   ],
 }[lang];
-const labels = { you: text.you, bot: text.bot, wpm: text.wpm, win: text.win, lose: text.lose, go: text.go, idle: text.idle, start: text.start, again: text.again };
+const labels = { error: text.error, crash: text.crash, you: text.you, bot: text.bot, wpm: text.wpm, win: text.win, lose: text.lose, go: text.go, idle: text.idle, start: text.start, again: text.again };
 const resultTemplate = lang === 'de' ? 'Du: {me} WPM, Tim: {bot} WPM, Fehler: {m}.' : 'You: {me} WPM, Tim: {bot} WPM, mistakes: {m}.';
 ---
 <section class="race" data-passages={JSON.stringify(passages)} data-labels={JSON.stringify(labels)} data-result={resultTemplate}>
@@ -59,6 +63,8 @@ const resultTemplate = lang === 'de' ? 'Du: {me} WPM, Tim: {bot} WPM, Fehler: {m
 </section>
 
 <script>
+  import { unlock } from '../scripts/achievements';
+
   const root = document.querySelector<HTMLElement>('.race');
   if (root) {
     const passages: string[] = JSON.parse(root.dataset.passages!);
@@ -85,6 +91,8 @@ const resultTemplate = lang === 'de' ? 'Du: {me} WPM, Tim: {bot} WPM, Fehler: {m
     const BOT_WPM = 95;
     let botChars = 0;
     let lastFrame = 0;
+    let typedAny = false;
+    const IDLE_MS = 5000;
 
     const span = (cls: string, txt: string) => {
       const s = document.createElement('span');
@@ -127,6 +135,7 @@ const resultTemplate = lang === 'de' ? 'Du: {me} WPM, Tim: {bot} WPM, Fehler: {m
       wpmEl.bot.textContent = String(botWpm);
       button.textContent = L.again;
       button.hidden = false;
+      if (youFinished) unlock('race-won');
     };
 
     const frame = (now: number) => {
@@ -144,9 +153,24 @@ const resultTemplate = lang === 'de' ? 'Du: {me} WPM, Tim: {bot} WPM, Fehler: {m
       else raf = requestAnimationFrame(frame);
     };
 
+    // Easter Egg: Nach dem Start kommt keine Eingabe, also meldet das Textfeld einen Fehler und der Bot stürzt ab.
+    const crash = () => {
+      if (!running || typedAny) return;
+      running = false;
+      clearTimers();
+      input.disabled = true;
+      input.value = L.error;
+      input.classList.add('race-error');
+      status.textContent = L.crash;
+      button.textContent = L.again;
+      button.hidden = false;
+      unlock('race-won');
+    };
+
     input.addEventListener('paste', (e) => e.preventDefault());
     input.addEventListener('input', () => {
       if (!running) return;
+      typedAny = true;
       const typed = input.value;
       const prevOk = correctPrefix(prevTyped);
       const ok = render(typed);
@@ -171,6 +195,7 @@ const resultTemplate = lang === 'de' ? 'Du: {me} WPM, Tim: {bot} WPM, Fehler: {m
       startedAt = performance.now();
       lastFrame = startedAt;
       raf = requestAnimationFrame(frame);
+      timers.push(window.setTimeout(crash, IDLE_MS));
     };
 
     button.addEventListener('click', () => {
@@ -179,6 +204,8 @@ const resultTemplate = lang === 'de' ? 'Du: {me} WPM, Tim: {bot} WPM, Fehler: {m
       if (i === lastIndex) i = (i + 1) % passages.length;
       lastIndex = i;
       passage = passages[i];
+      typedAny = false;
+      input.classList.remove('race-error');
       mistakes = 0; prevTyped = ''; youDone = 0; youChars = 0; botDone = 0; botChars = 0;
       input.value = '';
       input.disabled = true;
