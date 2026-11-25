@@ -26,6 +26,9 @@ const nav = [
     <meta name="description" content={desc} />
     <script is:inline>try { var th = localStorage.getItem('theme'); if (th) document.documentElement.dataset.theme = th; } catch (e) {}</script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {import.meta.env.PROD && (
+      <script is:inline type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "890885968c18448382c112be9895bcdf"}'></script>
+    )}
     <link rel="canonical" href={`${site}/${lang}/${path}`} />
     <link rel="alternate" hreflang="de" href={`${site}/de/${path}`} />
     <link rel="alternate" hreflang="en" href={`${site}/en/${path}`} />

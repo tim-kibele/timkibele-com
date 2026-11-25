@@ -10,7 +10,7 @@ Persönliche Profilseite von Tim Kibele, online unter [www.timkibele.com](https:
 - **Lebenslauf:** Berufserfahrung, Ausbildung, Technologien
 - **Geheimnisse:** Übersicht der Easter Eggs, die auf der Seite versteckt sind. Gefundene stehen dort, für die anderen gibt es einen Tipp. Der Fortschritt bleibt im Browser (localStorage), nichts wird gesendet
 - **Datenschutz**
-- Sitemap, robots.txt, Open-Graph-Vorschaubild und Lebenslauf als PDF zum Herunterladen
+- Sitemap, robots.txt, Open-Graph-Vorschaubild und Lebenslauf als PDF zum Herunterladen. Besucherzahlen über Cloudflare Web Analytics (ohne Cookies, nur im Produktions-Build)
 
 ## Technik
 
