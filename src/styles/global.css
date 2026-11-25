@@ -223,6 +223,7 @@ h2 { margin-top: var(--space-2xl); }
 .gamepad .heart { fill: var(--color-accent); stroke: var(--color-accent); stroke-width: 0.8; transition: fill var(--dur-long) var(--ease-out), stroke var(--dur-long) var(--ease-out); }
 .gamepad .heart.lost { fill: none; stroke: var(--color-rule-2); }
 .gamepad .hearts-hit { fill: none; pointer-events: all; cursor: pointer; }
+.gamepad .heart { pointer-events: none; }
 .gamepad .boss-quest { display: none; }
 .gamepad .boss-quest.show { display: inline; }
 .gamepad .boss-quest .box { transform-box: fill-box; transform-origin: center; transform: rotate(45deg); }
