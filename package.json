@@ -15,6 +15,7 @@
     "@fontsource/hanken-grotesk": "^5.3.0",
     "@fontsource/newsreader": "^5.3.0",
     "@fontsource/vollkorn": "^5.3.0",
-    "astro": "^7.4.13"
+    "astro": "^7.4.13",
+    "chess.js": "^1.4.0"
   }
 }

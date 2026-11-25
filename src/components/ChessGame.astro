@@ -1,0 +1,272 @@
+---
+import type { Lang } from '../i18n/ui';
+
+// Schachpartie gegen Stockfish, im Browser des Besuchers. Die Engine (Stockfish.js, GPLv3) liegt in
+// public/stockfish/ und wird erst beim Start einer Partie geladen. Sie ist über UCI_Elo auf 1500 begrenzt
+// und sucht nur bis Tiefe 6. In Testpartien gegen Stockfishs eigene Begrenzung auf 1320 lag das bei
+// ungefähr 1480 auf Stockfishs Skala (Suchtiefe statt fester Zeit, damit es nicht vom Gerät abhängt).
+// Es gibt kein Zeitlimit. Es werden keine Daten gesendet.
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const text = {
+  de: {
+    bot: 'Stockfish (ca. 1500)', you: 'Du',
+    side: 'Du spielst', white: 'Weiß', black: 'Schwarz',
+    start: 'Partie starten', again: 'Nochmal', resign: 'Aufgeben',
+    idle: 'Wähle deine Farbe und starte die Partie.',
+    loading: 'Die Engine wird geladen …', failed: 'Die Engine konnte nicht geladen werden.',
+    yourTurn: 'Du bist am Zug.', thinking: 'Stockfish denkt nach …', check: 'Schach!',
+    mate: 'Schachmatt.', stalemate: 'Patt.', draw: 'Remis.', resigned: 'Du hast aufgegeben.',
+    won: 'Du hast gewonnen.', lost: 'Du hast verloren.', drawn: 'Unentschieden.',
+    board: 'Schachbrett',
+    source: 'Engine: Stockfish.js (GPLv3)',
+    noscript: 'Die Schachpartie braucht JavaScript.',
+    pieces: { p: 'Bauer', n: 'Springer', b: 'Läufer', r: 'Turm', q: 'Dame', k: 'König' }, w: 'weißer', bl: 'schwarzer',
+  },
+  en: {
+    bot: 'Stockfish (about 1500)', you: 'You',
+    side: 'You play', white: 'White', black: 'Black',
+    start: 'Start game', again: 'Again', resign: 'Resign',
+    idle: 'Pick your colour and start the game.',
+    loading: 'Loading the engine …', failed: 'The engine could not be loaded.',
+    yourTurn: 'Your move.', thinking: 'Stockfish is thinking …', check: 'Check!',
+    mate: 'Checkmate.', stalemate: 'Stalemate.', draw: 'Draw.', resigned: 'You resigned.',
+    won: 'You won.', lost: 'You lost.', drawn: 'It is a draw.',
+    board: 'Chess board',
+    source: 'Engine: Stockfish.js (GPLv3)',
+    noscript: 'The chess game needs JavaScript.',
+    pieces: { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' }, w: 'white', bl: 'black',
+  },
+}[lang];
+---
+<section class="chess" data-labels={JSON.stringify(text)}>
+  <form class="chess-setup">
+    <label>{text.side}
+      <select name="side"><option value="w">{text.white}</option><option value="b">{text.black}</option></select>
+    </label>
+    <button class="btn btn--primary" type="submit" data-start>{text.start}</button>
+  </form>
+
+  <p class="chess-name" data-name="top">{text.bot}</p>
+  <div class="chess-board" role="group" aria-label={text.board}></div>
+  <p class="chess-name" data-name="bottom">{text.you}</p>
+
+  <p class="chess-status" aria-live="polite">{text.idle}</p>
+  <div class="chess-actions"><button class="btn" type="button" data-resign hidden>{text.resign}</button></div>
+  <p class="chess-note"><a href="/stockfish/README.txt">{text.source}</a></p>
+  <noscript><p>{text.noscript}</p></noscript>
+</section>
+
+<script>
+  import { Chess, type Square, type Move } from 'chess.js';
+
+  const root = document.querySelector<HTMLElement>('.chess');
+  if (root) {
+    const L = JSON.parse(root.dataset.labels!);
+    const boardEl = root.querySelector<HTMLElement>('.chess-board')!;
+    const form = root.querySelector<HTMLFormElement>('.chess-setup')!;
+    const startBtn = root.querySelector<HTMLButtonElement>('[data-start]')!;
+    const resignBtn = root.querySelector<HTMLButtonElement>('[data-resign]')!;
+    const sideSelect = form.querySelector<HTMLSelectElement>('select')!;
+    const statusEl = root.querySelector<HTMLElement>('.chess-status')!;
+    const nameEl = { top: root.querySelector<HTMLElement>('[data-name="top"]')!, bottom: root.querySelector<HTMLElement>('[data-name="bottom"]')! };
+
+    // Eigene, schlichte Figuren (45 x 45): gefüllte Silhouetten mit Umriss in Gegenfarbe, damit beide
+    // Farben auf hellen und dunklen Feldern lesbar sind. Klasse b: Körper, d: Punkt, l: dicke Linie.
+    const feet = '<path class="b" d="M10 41 Q10 36 14.5 35 H30.5 Q35 36 35 41 Z"/>';
+    const shapes: Record<string, string> = {
+      p: '<circle class="b" cx="22.5" cy="13" r="5.6"/><path class="b" d="M15 35 Q15.5 25 20 21 H25 Q29.5 25 30 35 Z"/><rect class="b" x="16.5" y="19" width="12" height="3.4" rx="1.7"/>',
+      r: '<path class="b" d="M13.5 35 L15.5 18 H29.5 L31.5 35 Z"/><path class="b" d="M12 18 V8.5 H17 V12 H20.5 V8.5 H24.5 V12 H28 V8.5 H33 V18 Z"/>',
+      n: '<path class="b" d="M14 35 C13.5 27 17.5 24.5 19.5 20.5 C16.5 21 13.5 20 11.5 23 C10.5 18 14.5 11.5 20.5 9 L21.5 5.5 L25 8.5 C32 10.5 34 20 32 35 Z"/><circle class="d" cx="22.5" cy="13.5" r="1.6"/>',
+      b: '<circle class="b" cx="22.5" cy="6" r="2.6"/><path class="b" d="M22.5 8 C29 13 30.5 18 28.5 22.5 C27.5 25 26.5 26 26.5 29 H18.5 C18.5 26 17.5 25 16.5 22.5 C14.5 18 16 13 22.5 8 Z"/><path class="l" d="M19.5 17.5 L25 12.5"/><rect class="b" x="15" y="28.5" width="15" height="3.6" rx="1.8"/><path class="b" d="M13.5 35 Q14 32 22.5 32 Q31 32 31.5 35 Z"/>',
+      q: '<path class="b" d="M12 35 L8.5 15 L16 25 L18.5 12 L22.5 24 L26.5 12 L29 25 L36.5 15 L33 35 Z"/><circle class="b" cx="8.5" cy="13" r="2.4"/><circle class="b" cx="18.5" cy="9.5" r="2.4"/><circle class="b" cx="26.5" cy="9.5" r="2.4"/><circle class="b" cx="36.5" cy="13" r="2.4"/>',
+      k: '<rect class="b" x="21" y="3.5" width="3" height="12" rx="1"/><rect class="b" x="17.5" y="7" width="10" height="3" rx="1"/><path class="b" d="M15.5 24 C15.5 18 19 16 22.5 16 C26 16 29.5 18 29.5 24 Z"/><path class="b" d="M13.5 35 C12 29 15 26 16 24 H29 C30 26 33 29 31.5 35 Z"/>',
+    };
+    const pieceSvg = (type: string, color: string) =>
+      `<svg class="piece piece--${color}" viewBox="0 0 45 45" aria-hidden="true" focusable="false">${shapes[type]}${feet}</svg>`;
+
+    const DEPTH = 6;
+    const MIN_THINK = 500;
+
+    let game = new Chess();
+    let me: 'w' | 'b' = 'w';
+    let playing = false;
+    let thinking = false;
+    let selected: Square | null = null;
+    let targets: Move[] = [];
+    let last: { from: string; to: string } | null = null;
+    let gameId = 0;
+
+    // ---- Anzeige ----
+    const pieceName = (type: string, color: string) => `${color === 'w' ? L.w : L.bl} ${L.pieces[type]}`;
+
+    const renderBoard = () => {
+      const files = me === 'w' ? 'abcdefgh' : 'hgfedcba';
+      const ranks = me === 'w' ? [8, 7, 6, 5, 4, 3, 2, 1] : [1, 2, 3, 4, 5, 6, 7, 8];
+      const inCheck = game.inCheck();
+      const frag = document.createDocumentFragment();
+      for (const r of ranks) {
+        for (const f of files) {
+          const sq = `${f}${r}` as Square;
+          const piece = game.get(sq);
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.dataset.sq = sq;
+          const light = (f.charCodeAt(0) - 97 + r) % 2 === 1;
+          btn.className = `sq ${light ? 'light' : 'dark'}`;
+          if (selected === sq) btn.classList.add('sel');
+          const t = targets.find((m) => m.to === sq);
+          if (t) btn.classList.add(piece ? 'capture' : 'target');
+          if (last && (last.from === sq || last.to === sq)) btn.classList.add('last');
+          if (inCheck && piece?.type === 'k' && piece.color === game.turn()) btn.classList.add('check');
+          if (piece) btn.innerHTML = pieceSvg(piece.type, piece.color);
+          btn.setAttribute('aria-label', piece ? `${sq}, ${pieceName(piece.type, piece.color)}` : sq);
+          frag.append(btn);
+        }
+      }
+      boardEl.replaceChildren(frag);
+      nameEl.top.textContent = L.bot;
+      nameEl.bottom.textContent = L.you;
+    };
+
+    // ---- Engine ----
+    let worker: Worker | null = null;
+    let engineReady: Promise<void> | null = null;
+
+    const loadEngine = () =>
+      (engineReady ??= new Promise<void>((resolve, reject) => {
+        const w = new Worker('/stockfish/stockfish-19-lite-single.js');
+        worker = w;
+        w.onerror = () => { engineReady = null; worker = null; reject(new Error('engine')); };
+        const onMsg = (e: MessageEvent) => {
+          if (e.data === 'uciok') {
+            w.postMessage('setoption name UCI_LimitStrength value true');
+            w.postMessage('setoption name UCI_Elo value 1500');
+            w.postMessage('isready');
+          } else if (e.data === 'readyok') {
+            w.removeEventListener('message', onMsg);
+            resolve();
+          }
+        };
+        w.addEventListener('message', onMsg);
+        w.postMessage('uci');
+      }));
+
+    const bestMove = (moves: string[]) =>
+      new Promise<string>((resolve) => {
+        const w = worker!;
+        const onMsg = (e: MessageEvent) => {
+          const m = typeof e.data === 'string' ? e.data.match(/^bestmove (\S+)/) : null;
+          if (m) { w.removeEventListener('message', onMsg); resolve(m[1]); }
+        };
+        w.addEventListener('message', onMsg);
+        w.postMessage(`position startpos moves ${moves.join(' ')}`);
+        w.postMessage(`go depth ${DEPTH}`);
+      });
+
+    // ---- Ablauf ----
+    const setStatus = (s: string) => { statusEl.textContent = s; };
+
+    const end = (message: string, iWon: boolean | null) => {
+      playing = false;
+      thinking = false;
+      selected = null;
+      targets = [];
+      setStatus(`${message} ${iWon === null ? L.drawn : iWon ? L.won : L.lost}`);
+      sideSelect.disabled = false;
+      startBtn.hidden = false;
+      startBtn.textContent = L.again;
+      resignBtn.hidden = true;
+      renderBoard();
+    };
+
+    const checkEnd = () => {
+      if (game.isCheckmate()) return end(L.mate, game.turn() !== me), true;
+      if (game.isStalemate()) return end(L.stalemate, null), true;
+      if (game.isDraw()) return end(L.draw, null), true;
+      return false;
+    };
+
+    const afterMove = () => {
+      if (checkEnd()) return;
+      if (game.turn() === me) setStatus(game.inCheck() ? `${L.check} ${L.yourTurn}` : L.yourTurn);
+      renderBoard();
+      if (game.turn() !== me) botMove();
+    };
+
+    const botMove = async () => {
+      const id = gameId;
+      thinking = true;
+      setStatus(game.inCheck() ? `${L.check} ${L.thinking}` : L.thinking);
+      const began = Date.now();
+      const history = game.history({ verbose: true }).map((m) => m.from + m.to + (m.promotion ?? ''));
+      const uci = await bestMove(history);
+      const wait = MIN_THINK - (Date.now() - began);
+      if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+      if (id !== gameId || !playing) return;
+      thinking = false;
+      const m = game.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] });
+      last = { from: m.from, to: m.to };
+      afterMove();
+    };
+
+    const startGame = async () => {
+      me = sideSelect.value === 'b' ? 'b' : 'w';
+      game = new Chess();
+      selected = null;
+      targets = [];
+      last = null;
+      gameId++;
+      const id = gameId;
+      sideSelect.disabled = true;
+      startBtn.hidden = true;
+      playing = false;
+      renderBoard();
+      setStatus(L.loading);
+      try {
+        await loadEngine();
+      } catch {
+        setStatus(L.failed);
+        sideSelect.disabled = false;
+        startBtn.hidden = false;
+        return;
+      }
+      if (id !== gameId) return;
+      worker!.postMessage('ucinewgame');
+      playing = true;
+      resignBtn.hidden = false;
+      if (game.turn() === me) setStatus(L.yourTurn);
+      else botMove();
+    };
+
+    // ---- Eingabe ----
+    boardEl.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLElement>('.sq');
+      if (!btn || !playing || thinking || game.turn() !== me) return;
+      const sq = btn.dataset.sq as Square;
+      const move = targets.find((m) => m.to === sq);
+      if (selected && move) {
+        const m = game.move({ from: selected, to: sq, promotion: 'q' });
+        last = { from: m.from, to: m.to };
+        selected = null;
+        targets = [];
+        afterMove();
+        return;
+      }
+      const piece = game.get(sq);
+      if (piece && piece.color === me && sq !== selected) {
+        selected = sq;
+        targets = game.moves({ square: sq, verbose: true });
+      } else {
+        selected = null;
+        targets = [];
+      }
+      renderBoard();
+    });
+
+    form.addEventListener('submit', (e) => { e.preventDefault(); startGame(); });
+    resignBtn.addEventListener('click', () => { if (playing) end(L.resigned, false); });
+    renderBoard();
+  }
+</script>

@@ -17,13 +17,19 @@ text:
     - Minecraft
     - Titanfall 2
 
+    ## Als Nächstes
+
+    Auf meiner Liste stehen Vampire Survivors und Bully. Ich bin immer offen für Vorschläge :)
+
     ## Multiplayer
 
     Am meisten mag ich League of Legends. Es reizt mich wegen seiner Komplexität, des Wettbewerbs und der hohen Skill Ceiling.
 
-    ## Als Nächstes
+    ## Schach
 
-    Auf meiner Liste stehen Vampire Survivors und Bully. Ich bin immer offen für Vorschläge :)
+    Schach spiele ich auch ab und zu, meine Elo liegt bei etwa 1200. Denkst du, du kannst mich schlagen? ;)
+
+    ::chess
   en: |-
     Video games are a welcome break from everyday life and one of my favourite art forms. I play many very different kinds of games.
 
@@ -37,11 +43,17 @@ text:
     - Minecraft
     - Titanfall 2
 
+    ## Up next
+
+    Vampire Survivors and Bully are on my list. I am always open to suggestions :)
+
     ## Multiplayer
 
     I like League of Legends the most. It appeals to me for its complexity, its competitiveness and its high skill ceiling.
 
-    ## Up next
+    ## Chess
 
-    Vampire Survivors and Bully are on my list. I am always open to suggestions :)
+    I play chess every now and then too, and my rating is around 1200. Do you think you can beat me? ;)
+
+    ::chess
 ---
