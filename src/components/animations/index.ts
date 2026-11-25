@@ -1,4 +1,5 @@
 import AgentTeam from './AgentTeam.astro';
+import Gamepad from './Gamepad.astro';
 import NeuralNet from './NeuralNet.astro';
 import ScanList from './ScanList.astro';
 import Workflow from './Workflow.astro';
@@ -11,4 +12,5 @@ export const animations = {
   workflow: Workflow,
   scan: ScanList,
   agents: AgentTeam,
+  gamepad: Gamepad,
 } as const;

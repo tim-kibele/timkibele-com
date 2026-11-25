@@ -1,0 +1,87 @@
+---
+// Dekorative Spiel-Oberfläche am rechten Rand für die Gaming-Seite: drei Leben, eine Erfahrungsleiste mit Levelanzeige und eine kleine Aufgabenliste.
+// Die Struktur ist festes SVG (sichtbar ohne JavaScript und bei "Bewegung reduzieren"),
+// das Skript lässt nur die Werte laufen.
+const hearts = [44, 70, 96];
+const quests = [330, 370, 410];
+const heart = 'M0 5 C-8 -1 -4 -7 0 -3 C4 -7 8 -1 0 5 Z';
+---
+<svg class="margin-art gamepad" viewBox="0 0 140 470" preserveAspectRatio="xMidYMin meet" aria-hidden="true" focusable="false">
+  {hearts.map((x) => (
+    <path class="heart" transform={`translate(${x} 160) scale(1.8)`} d={heart} />
+  ))}
+
+  <text class="level" x="20" y="238">Lv 3</text>
+  <rect class="xp-track" x="20" y="248" width="100" height="8" rx="4" />
+  <rect class="xp-fill" x="20" y="248" width="100" height="8" rx="4" style="transform: scaleX(0.6)" />
+
+  {quests.map((y, i) => (
+    <g class={`quest${i < 2 ? ' done' : ''}`} transform={`translate(0 ${y})`}>
+      <rect class="box" x="22" y="-7" width="14" height="14" rx="3" />
+      <path class="tick" d="M25 0 L28.5 3.5 L34 -3.5" />
+      <rect class="line" x="46" y="-1.5" width={i === 0 ? 70 : i === 1 ? 54 : 62} height="3" rx="1.5" />
+    </g>
+  ))}
+</svg>
+
+<script>
+  const svg = document.querySelector<SVGSVGElement>('.gamepad');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  if (svg) {
+    const hearts = [...svg.querySelectorAll<SVGElement>('.heart')];
+    const quests = [...svg.querySelectorAll<SVGElement>('.quest')];
+    const levelEl = svg.querySelector('.level')!;
+    const bar = svg.querySelector<SVGElement>('.xp-fill')!;
+    const rand = (a: number, b: number) => a + Math.random() * (b - a);
+
+    let level = 3;
+    let xp = 60;
+    let lives = 3;
+    let timer = 0;
+    let alive = false;
+
+    const setXp = () => (bar.style.transform = `scaleX(${xp / 100})`);
+    const setHearts = () => hearts.forEach((h, i) => h.classList.toggle('lost', i >= lives));
+    const flash = (el: Element, ms: number) => {
+      el.classList.add('on');
+      setTimeout(() => el.classList.remove('on'), ms);
+    };
+
+    const tick = () => {
+      if (!alive) return;
+      if (svg.getBoundingClientRect().width > 0) {
+        // Zwischendurch gibt es Erfahrung.
+        xp += rand(8, 18);
+        if (xp >= 100) {
+          xp = 0;
+          level += 1;
+          levelEl.textContent = `Lv ${level}`;
+          flash(bar, 700);
+          // Ein Level erledigt die nächste Aufgabe, danach beginnt die Liste von vorn.
+          const next = quests.find((q) => !q.classList.contains('done'));
+          if (next) next.classList.add('done');
+          else quests.forEach((q, i) => q.classList.toggle('done', i === 0));
+        }
+        setXp();
+        // Gelegentlich kostet ein Treffer ein Leben, beim letzten Leben gibt es Heilung.
+        if (Math.random() < 0.14) {
+          lives = lives > 1 ? lives - 1 : 3;
+          setHearts();
+        }
+      }
+      timer = window.setTimeout(tick, rand(700, 1500));
+    };
+
+    const start = () => {
+      alive = true;
+      timer = window.setTimeout(tick, 900);
+    };
+    if (!reduce.matches) start();
+    reduce.addEventListener('change', () => {
+      if (reduce.matches) {
+        alive = false;
+        clearTimeout(timer);
+      } else if (!alive) start();
+    });
+  }
+</script>
