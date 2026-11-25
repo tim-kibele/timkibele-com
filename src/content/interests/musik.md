@@ -2,6 +2,7 @@
 title:
   de: Musik
   en: Music
+animation: equalizer
 text:
   de: |-
     Musik höre ich eigentlich überall: zu Hause, im Gym oder im Zug. Ich würde von mir selbst behaupten, dass ich einen ziemlich breit gefächerten Musikgeschmack habe, und ich lege mich ungern auf eine einzige Richtung fest.
@@ -16,6 +17,8 @@ text:
     - Nur ein Wort von Wir sind Helden
     - Lady Brown von Nujabes
     - Lovers Rock von TV Girl
+
+    ::tiles
   en: |-
     I listen to music pretty much everywhere: at home, at the gym or on the train. I would say I have a fairly wide-ranging taste in music, and I do not like to commit to a single direction.
 
@@ -29,4 +32,6 @@ text:
     - Nur ein Wort by Wir sind Helden
     - Lady Brown by Nujabes
     - Lovers Rock by TV Girl
+
+    ::tiles
 ---

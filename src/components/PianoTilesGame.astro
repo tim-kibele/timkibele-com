@@ -1,0 +1,226 @@
+---
+import type { Lang } from '../i18n/ui';
+
+// Easter Egg auf der Musik-Seite: Dreimal schnell auf die Überschrift der Songliste tippen, dann erscheint
+// ein Kachelspiel (vier Spuren, dunkle Kacheln fallen, man tippt sie an). Jede Kachel spielt die nächste Note von
+// "Für Elise" (Beethoven, † 1827, gemeinfrei) in einer Kurzfassung (das Thema einmal); die Töne erzeugt der Browser selbst (Web Audio).
+// Es werden keine Aufnahmen und keine geschützten Melodien benutzt, deshalb braucht es keine Lizenzen. Neue Level
+// dürfen nur gemeinfreie Stücke sein (Komponist seit über 70 Jahren tot). Ohne JavaScript ist das Spiel nicht sichtbar.
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const text = {
+  de: {
+    intro: 'Tippe die dunklen Kacheln an, immer die unterste zuerst. Jeder Treffer spielt die nächste Note. Am Computer geht es mit den Tasten D, F, J und K.',
+    levels: 'Stück wählen', board: 'Spielfeld mit vier Spuren',
+    ready: 'Gleich geht es los …', miss: 'Daneben.', hits: 'Treffer', win: 'Geschafft, alle Kacheln getroffen.',
+    close: 'Schließen',
+  },
+  en: {
+    intro: 'Tap the dark tiles, always the lowest one first. Every hit plays the next note. On a computer you can use the keys D, F, J and K.',
+    levels: 'Pick a piece', board: 'Game field with four lanes',
+    ready: 'Get ready …', miss: 'Missed.', hits: 'hits', win: 'Done, you hit every tile.',
+    close: 'Close',
+  },
+}[lang];
+
+// Kurzfassung von "Für Elise" (MIDI-Tonhöhen): das Thema, einmal durchgespielt, 35 Kacheln, etwa 11 Sekunden.
+const phrase = [
+  76, 75, 76, 75, 76, 71, 74, 72, 69,
+  60, 64, 69, 71,
+  64, 68, 71, 72,
+  64, 76, 75, 76, 75, 76, 71, 74, 72, 69,
+  60, 64, 69, 71,
+  64, 72, 71, 69,
+];
+const melody = phrase;
+const NOTES_PER_SEC = 3.2;
+const seconds = Math.round(melody.length / NOTES_PER_SEC);
+const labels = { melody: melody, rate: NOTES_PER_SEC, ready: text.ready, miss: text.miss, hits: text.hits, win: text.win, };
+---
+<section class="tiles" data-labels={JSON.stringify(labels)} hidden>
+  <p class="tiles-intro">{text.intro}</p>
+  <div class="tiles-levels" role="group" aria-label={text.levels}>
+    <button type="button" class="tiles-level" aria-pressed="false">
+      <span>Für Elise</span>
+      <span class="tiles-bpm">{lang === 'de' ? `ca. ${seconds} Sekunden` : `about ${seconds} seconds`}</span>
+    </button>
+  </div>
+  <div class="tiles-board" role="application" aria-label={text.board} tabindex="0">
+    <div class="tiles-lane"></div><div class="tiles-lane"></div><div class="tiles-lane"></div><div class="tiles-lane"></div>
+    <div class="tiles-rows"></div>
+  </div>
+  <p class="tiles-status" aria-live="polite"></p>
+  <button type="button" class="tiles-close">{text.close}</button>
+</section>
+
+<script>
+  import { unlock } from '../scripts/achievements';
+
+  const root = document.querySelector<HTMLElement>('.tiles');
+  const heading = document.querySelector<HTMLElement>('.topic > h2');
+  if (root && heading) {
+    const L = JSON.parse(root.dataset.labels!);
+    const board = root.querySelector<HTMLElement>('.tiles-board')!;
+    const layer = root.querySelector<HTMLElement>('.tiles-rows')!;
+    const lanes = [...root.querySelectorAll<HTMLElement>('.tiles-lane')];
+    const status = root.querySelector<HTMLElement>('.tiles-status')!;
+    const levelBtns = [...root.querySelectorAll<HTMLButtonElement>('.tiles-level')];
+    const melody: number[] = L.melody;
+    const TOTAL = melody.length;
+    const KEYS = ['d', 'f', 'j', 'k'];
+
+    type Row = { el: HTMLElement; y: number; lane: number; hit: boolean };
+    let rows: Row[] = [];
+    let running = false;
+    let raf = 0;
+    let startTimer = 0;
+    let speed = 0;
+    let rowH = 0;
+    let spawned = 0;
+    let hits = 0;
+    let last = 0;
+    let audio: AudioContext | null = null;
+
+    // Jede Kachel spielt die nächste Note der Melodie: ein Dreieckton plus ein leiser Oberton, der schnell abklingt.
+    const tone = (midi: number) => {
+      audio ??= new AudioContext();
+      if (audio.state === 'suspended') void audio.resume();
+      const t = audio.currentTime;
+      const freq = 440 * 2 ** ((midi - 69) / 12);
+      const g = audio.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.28, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
+      g.connect(audio.destination);
+      for (const [type, mult, vol] of [['triangle', 1, 1], ['sine', 2, 0.25]] as const) {
+        const o = audio.createOscillator();
+        const v = audio.createGain();
+        o.type = type;
+        o.frequency.value = freq * mult;
+        v.gain.value = vol;
+        o.connect(v).connect(g);
+        o.start(t);
+        o.stop(t + 0.75);
+      }
+    };
+
+    const place = (r: Row) => (r.el.style.transform = `translateY(${r.y}px)`);
+    const spawn = (y: number) => {
+      const el = document.createElement('div');
+      el.className = 'tiles-tile';
+      const lane = Math.floor(Math.random() * 4);
+      el.style.left = `${lane * 25}%`;
+      el.style.height = `${rowH}px`;
+      layer.append(el);
+      const r: Row = { el, y, lane, hit: false };
+      rows.push(r);
+      place(r);
+      spawned++;
+    };
+
+    const stop = () => {
+      running = false;
+      cancelAnimationFrame(raf);
+      clearTimeout(startTimer);
+    };
+    const fail = (lane: number | null, target?: Row) => {
+      stop();
+      if (lane !== null) lanes[lane].classList.add('miss');
+      target?.el.classList.add('missed');
+      status.textContent = `${L.miss} ${hits} ${L.hits}.`;
+    };
+
+    const frame = (now: number) => {
+      if (!running) return;
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+      for (const r of rows) {
+        r.y += speed * dt;
+        place(r);
+      }
+      const top = rows.length ? Math.min(...rows.map((r) => r.y)) : 0;
+      if (spawned < TOTAL && top >= 0) spawn(top - rowH);
+      const next = rows.find((r) => !r.hit);
+      if (next && next.y >= board.clientHeight) return fail(null, next);
+      while (rows.length && rows[0].hit && rows[0].y > board.clientHeight) rows.shift()!.el.remove();
+      raf = requestAnimationFrame(frame);
+    };
+
+    const start = () => {
+      stop();
+      layer.replaceChildren();
+      lanes.forEach((l) => l.classList.remove('miss'));
+      rows = [];
+      spawned = 0;
+      hits = 0;
+      rowH = board.clientHeight / 4;
+      speed = rowH * L.rate; // Kacheln pro Sekunde
+      status.textContent = L.ready;
+      startTimer = window.setTimeout(() => {
+        spawn(-rowH);
+        running = true;
+        last = performance.now();
+        status.textContent = `0 ${L.hits}`;
+        raf = requestAnimationFrame(frame);
+      }, 700);
+      board.focus({ preventScroll: true });
+      board.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    };
+
+    const press = (lane: number) => {
+      if (!running) return;
+      const target = rows.find((r) => !r.hit);
+      if (!target) return;
+      if (target.lane !== lane) return fail(lane, target);
+      target.hit = true;
+      target.el.classList.add('hit');
+      hits++;
+      tone(melody[hits - 1]);
+      status.textContent = `${hits} ${L.hits}`;
+      if (hits === TOTAL) {
+        stop();
+        status.textContent = L.win;
+      }
+    };
+
+    board.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      const rect = board.getBoundingClientRect();
+      press(Math.min(3, Math.max(0, Math.floor(((e.clientX - rect.left) / rect.width) * 4))));
+    });
+    addEventListener('keydown', (e) => {
+      if (root.hidden) return;
+      const i = KEYS.indexOf(e.key.toLowerCase());
+      if (i >= 0 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        press(i);
+      }
+    });
+    levelBtns.forEach((b) =>
+      b.addEventListener('click', () => {
+        levelBtns.forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+        start();
+      }),
+    );
+    root.querySelector('.tiles-close')!.addEventListener('click', () => {
+      stop();
+      root.hidden = true;
+    });
+
+    // Auslöser: dreimal kurz hintereinander auf die Überschrift der Songliste tippen.
+    let taps = 0;
+    let lastTap = 0;
+    heading.addEventListener('click', () => {
+      const now = performance.now();
+      taps = now - lastTap < 700 ? taps + 1 : 1;
+      lastTap = now;
+      if (taps >= 3 && root.hidden) {
+        root.hidden = false;
+        status.textContent = '';
+        unlock('piano-tiles');
+        root.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    });
+  }
+</script>

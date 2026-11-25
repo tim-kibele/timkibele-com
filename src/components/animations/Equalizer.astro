@@ -1,0 +1,60 @@
+---
+// Dekorative Animation für die Musik-Seite: Eine Spalte aus waagerechten Balken wippt wie ein Equalizer von der
+// Seite. Ein Balken pendelt etwa im Takt von 92 BPM (eine Periode = zwei Schläge, rund 1,3 s), jeder mit etwas
+// versetztem Rhythmus. Die Struktur ist festes SVG mit einem festen Ruhezustand (sichtbar ohne JavaScript und bei
+// "Bewegung reduzieren"), die Bewegung kommt allein aus CSS. Das Skript passt die Zahl der Balken an die Höhe des
+// Textes an, damit unter dem Text keine leere Fläche bleibt. Wächst der Text (zum Beispiel wenn auf der Musik-Seite
+// das Kachelspiel aufklappt), kommen Balken dazu.
+const count = 26;
+const bars = Array.from({ length: count }, (_, i) => ({
+  y: 14 + i * 22,
+  s: Math.round((0.35 + 0.65 * Math.abs(Math.sin(i * 0.9 + 0.6))) * 100) / 100,
+}));
+---
+<svg class="margin-art equalizer" viewBox={`0 0 140 ${14 + count * 22}`} preserveAspectRatio="xMidYMin meet" aria-hidden="true" focusable="false">
+  {bars.map((b, i) => (
+    <g style={`--i:${i};--v:${i % 3};--s:${b.s}`}>
+      <rect class="eq-track" x="20" y={b.y} width="100" height="10" rx="5" />
+      <rect class="eq-bar" x="20" y={b.y} width="100" height="10" rx="5" />
+    </g>
+  ))}
+</svg>
+
+<script>
+  const svg = document.querySelector<SVGSVGElement>('.equalizer');
+  const text = document.querySelector<HTMLElement>('.split-text');
+  if (svg && text) {
+    const NS = 'http://www.w3.org/2000/svg';
+    const top = 14;
+    const pitch = 22;
+    const bar = (i: number) => {
+      const g = document.createElementNS(NS, 'g');
+      const s = Math.round((0.35 + 0.65 * Math.abs(Math.sin(i * 0.9 + 0.6))) * 100) / 100;
+      g.setAttribute('style', `--i:${i};--v:${i % 3};--s:${s}`);
+      for (const cls of ['eq-track', 'eq-bar']) {
+        const r = document.createElementNS(NS, 'rect');
+        r.setAttribute('class', cls);
+        r.setAttribute('x', '20');
+        r.setAttribute('y', String(top + i * pitch));
+        r.setAttribute('width', '100');
+        r.setAttribute('height', '10');
+        r.setAttribute('rx', '5');
+        g.append(r);
+      }
+      return g;
+    };
+    // Die Spalte soll genauso hoch sein wie der Text daneben.
+    const fit = () => {
+      const w = svg.getBoundingClientRect().width;
+      if (w === 0) return;
+      const h = text.getBoundingClientRect().height / (w / 140);
+      const n = Math.max(8, Math.floor((h - top) / pitch));
+      svg.setAttribute('viewBox', `0 0 140 ${top + n * pitch}`);
+      while (svg.childElementCount > n) svg.lastElementChild!.remove();
+      while (svg.childElementCount < n) svg.append(bar(svg.childElementCount));
+    };
+    new ResizeObserver(fit).observe(text);
+    addEventListener('resize', fit);
+    fit();
+  }
+</script>

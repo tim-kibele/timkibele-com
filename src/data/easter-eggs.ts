@@ -46,4 +46,12 @@ export const eggs: Egg[] = [
     hint: { de: 'Ein Werkzeug in meinen Fähigkeiten reagiert auf einen Klick.', en: 'One of the tools in my skills reacts to a click.' },
     found: { de: 'Auf Git und GitHub geklickt und den Lebenslauf als git log gesehen.', en: 'Clicked Git and GitHub and saw the CV as a git log.' },
   },
+  {
+    id: 'piano-tiles',
+    path: 'interessen/musik/',
+    page: { de: 'Musik-Seite', en: 'music page' },
+    title: { de: 'Kacheln im Takt', en: 'Tiles in time' },
+    hint: { de: 'Die Songliste kann mehr als lesen.', en: 'The song list can do more than be read.' },
+    found: { de: 'Dreimal auf "Lieblingssongs" getippt und das Kachelspiel gefunden.', en: 'Tapped "Favourite songs" three times and found the tile game.' },
+  },
 ];

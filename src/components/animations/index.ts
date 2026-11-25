@@ -1,4 +1,5 @@
 import AgentTeam from './AgentTeam.astro';
+import Equalizer from './Equalizer.astro';
 import Gamepad from './Gamepad.astro';
 import KeyboardArt from './KeyboardArt.astro';
 import NeuralNet from './NeuralNet.astro';
@@ -15,4 +16,5 @@ export const animations = {
   agents: AgentTeam,
   gamepad: Gamepad,
   keyboard: KeyboardArt,
+  equalizer: Equalizer,
 } as const;

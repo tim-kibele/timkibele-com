@@ -331,3 +331,31 @@ h2 { margin-top: var(--space-2xl); }
 .gitlog-exit { display: block; margin-top: var(--space-lg); padding: 0; font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 .gitlog-exit:hover { text-decoration: underline; }
 .gitlog-exit:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
+/* music page Easter egg: tile game */
+.tiles { max-width: 60ch; margin-top: var(--space-lg); }
+.tiles[hidden] { display: none; }
+.tiles-levels { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 14rem)); gap: var(--space-xs); margin-top: var(--space-md); }
+.tiles-level { display: grid; gap: var(--space-2xs); padding: var(--space-xs) var(--space-md); font: inherit; text-align: left; color: var(--color-ink); background: none; border: var(--rule-hair) solid var(--color-rule-2); border-radius: var(--radius-card); cursor: pointer; transition: background-color var(--dur-short) var(--ease-out); }
+.tiles-level:hover { background: var(--tint-moss); }
+.tiles-level[aria-pressed='true'] { background: var(--tint-moss); border-color: var(--color-accent); }
+.tiles-bpm { font-size: var(--text-xs); color: var(--color-muted); }
+.tiles-board { position: relative; width: 100%; max-width: 22rem; height: min(26rem, 68svh); margin-top: var(--space-md); overflow: hidden; touch-action: none; user-select: none; background: var(--color-paper-2); border: var(--rule-hair) solid var(--color-rule-2); border-radius: var(--radius-card); }
+.tiles-board:focus-visible, .tiles-level:focus-visible, .tiles-close:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.tiles-lane { position: absolute; top: 0; bottom: 0; width: 25%; border-right: var(--rule-hair) solid var(--color-rule); }
+.tiles-lane:nth-child(1) { left: 0; } .tiles-lane:nth-child(2) { left: 25%; } .tiles-lane:nth-child(3) { left: 50%; } .tiles-lane:nth-child(4) { left: 75%; border-right: 0; }
+.tiles-lane.miss { background: color-mix(in srgb, var(--color-error) 25%, transparent); }
+.tiles-rows { position: absolute; inset: 0; }
+.tiles-tile { position: absolute; top: 0; width: 25%; box-sizing: border-box; background: var(--color-ink); border: 3px solid var(--color-paper-2); border-radius: var(--radius-card); transition: opacity var(--dur-short) var(--ease-out); }
+.tiles-tile.hit { opacity: 0.18; }
+.tiles-tile.missed { background: var(--color-error); }
+.tiles-status { margin-top: var(--space-md); min-height: 1.6em; }
+.tiles-close { margin-top: var(--space-xs); padding: 0; font: inherit; font-size: var(--text-sm); color: var(--color-ink); background: none; border: 0; text-decoration: underline; cursor: pointer; }
+
+/* animation: equalizer (music page) */
+.equalizer .eq-track { fill: var(--tint-moss); }
+.equalizer .eq-bar { fill: var(--color-accent); transform-box: fill-box; transform-origin: left center; transform: scaleX(var(--s)); }
+@media (prefers-reduced-motion: no-preference) {
+  .equalizer .eq-bar { animation: eq calc(1.3s + var(--v) * 0.2s) ease-in-out infinite alternate; animation-delay: calc(var(--i) * -0.17s); }
+}
+@keyframes eq { from { transform: scaleX(0.22); } to { transform: scaleX(1); } }
