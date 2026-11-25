@@ -127,6 +127,8 @@ h2 { margin-top: var(--space-2xl); }
 .cv-row .when { font-size: var(--text-sm); color: var(--color-muted); font-variant-numeric: lining-nums tabular-nums; }
 .cv-row h3 { font-size: var(--text-lg); line-height: 1.25; }
 .cv-row .org { font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-2xs); }
+.cv-row .tags { margin: 0; }
+.cv-row .tags li { font-size: var(--text-sm); padding: var(--space-2xs) var(--space-sm); border-color: transparent; background: var(--tint-moss); color: var(--color-ink); }
 @media (max-width: 40rem) { .cv-row { grid-template-columns: minmax(0, 1fr); gap: var(--space-2xs); } }
 
 /* margin art: decorative animation, shown only inside the split layout below */
