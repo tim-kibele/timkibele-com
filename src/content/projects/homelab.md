@@ -23,8 +23,6 @@ detail:
         text: Das Skript schließt .env-Dateien aus und legt das Archiv nur für den Besitzer lesbar an. Ein Backup soll mich retten und kein neues Risiko sein.
       - title: Der Server soll sich selbst helfen
         text: Auf dem Laptop prüft ein Timer, ob das Netzwerk erreichbar ist, und lädt es bei einem Ausfall neu. SSH akzeptiert nur Schlüssel, kein Passwort.
-      - title: Was noch fehlt
-        text: Die Daten von n8n auf dem VPS landen noch nicht in dieser Sicherung. Das steht als Nächstes an.
     stack:
       - Ubuntu Server auf einem Laptop, Zugang per SSH nur mit Schlüssel und über Tailscale
       - Oracle-VPS mit n8n in Docker
@@ -46,8 +44,6 @@ detail:
         text: The script excludes .env files and creates the archive readable only by its owner. A backup should rescue me, not become a new risk.
       - title: The server should help itself
         text: On the laptop a timer checks whether the network is reachable and reloads it after an outage. SSH accepts keys only, no password.
-      - title: What is still missing
-        text: The data of n8n on the VPS is not part of this backup yet. That is next.
     stack:
       - Ubuntu Server on a laptop, access over SSH with keys only and through Tailscale
       - Oracle VPS running n8n in Docker

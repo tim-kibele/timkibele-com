@@ -46,3 +46,7 @@ Consult these guides before working on related tasks:
 - Link-Vorschau: Open-Graph- und Twitter-Tags in `src/layouts/Base.astro`, ein gemeinsames Bild `public/og.png` (1200 × 630, Name und Porträt).
 - Lebenslauf-PDFs (`public/Tim-Kibele-Lebenslauf.pdf`, `public/Tim-Kibele-CV.pdf`) kommen aus dem Druckstil der Lebenslaufseite (`@media print` in `global.css`). Nach jeder Änderung am Lebenslauf neu erzeugen: `npm run build`, dann `node scripts/cv-pdf.mjs` (braucht Playwright mit Chromium lokal).
 - Kein RSS: Es gibt keinen Blog und keine Berichte, die ein Feed ausliefern könnte.
+
+## Neue Projektseite
+
+Bei jeder neuen Projektseite (`src/content/projects/*.md`) den Lebenslauf mitpflegen: Programmiersprachen, Technologien und Werkzeuge in `src/pages/[lang]/lebenslauf/index.astro` ergänzen (beide Sprachen, nur was wirklich zum Projekt gehört und Tim nutzt), danach `npm run build` und `node scripts/cv-pdf.mjs`, damit die PDFs stimmen. Die Ergänzungen in der Antwort nennen, damit Tim sie prüfen kann.
