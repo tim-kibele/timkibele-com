@@ -9,8 +9,8 @@ const pageTitle = title ? `${title} · ${tr.siteTitle}` : tr.siteTitle;
 const desc = description ?? tr.tagline;
 const site = Astro.site!.origin;
 const href = (p: string) => `/${lang}/${p}`;
+// Der Name links führt auf die Startseite, deshalb gibt es keinen eigenen Menüpunkt "Start".
 const nav = [
-  ['', tr.nav.home],
   ['projekte/', tr.nav.projects],
   ['interessen/', tr.nav.interests],
   ['lebenslauf/', tr.nav.cv],
@@ -33,17 +33,22 @@ const nav = [
   <body>
     <header class="site">
       <div class={wide ? 'wrap wrap--wide' : 'wrap'}>
-        <a class="brand" href={href('')}>{tr.siteTitle}</a>
-        <nav>
+        <a class="brand" href={href('')} aria-current={Astro.url.pathname === href('') ? 'page' : undefined}>{tr.siteTitle}</a>
+        <nav id="site-nav">
           {nav.map(([p, label]) => (
             <a href={href(p)} aria-current={Astro.url.pathname === href(p) ? 'page' : undefined}>{label}</a>
           ))}
-          <a href={`/${other(lang)}/${path}`} hreflang={other(lang)}>{tr.switchTo}</a>
+        </nav>
+        <div class="tools">
+          <a class="lang-toggle" href={`/${other(lang)}/${path}`} hreflang={other(lang)} lang={other(lang)} aria-label={tr.switchTo} title={tr.switchTo}>{other(lang).toUpperCase()}</a>
           <button type="button" class="theme-toggle" data-dark={tr.theme.dark} data-light={tr.theme.light} hidden>
             <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" /></svg>
             <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6" /></svg>
           </button>
-        </nav>
+        </div>
+        <button type="button" class="menu-toggle" aria-controls="site-nav" aria-expanded="false" aria-label={tr.nav.menu} title={tr.nav.menu} hidden>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+        </button>
       </div>
     </header>
     <main class={wide ? 'wrap wrap--wide' : 'wrap'}><slot /></main>
@@ -53,6 +58,16 @@ const nav = [
       </div>
     </footer>
     <script is:inline>
+      (function () {
+        var m = document.querySelector('.menu-toggle'), n = document.getElementById('site-nav');
+        if (m && n) {
+          document.documentElement.classList.add('menu-js');
+          m.hidden = false;
+          function set(open) { n.classList.toggle('open', open); m.setAttribute('aria-expanded', open ? 'true' : 'false'); }
+          m.addEventListener('click', function () { set(!n.classList.contains('open')); });
+          document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && n.classList.contains('open')) { set(false); m.focus(); } });
+        }
+      })();
       (function () {
         var b = document.querySelector('.theme-toggle'), r = document.documentElement;
         var mq = matchMedia('(prefers-color-scheme: dark)');

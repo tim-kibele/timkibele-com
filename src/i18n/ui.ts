@@ -5,7 +5,7 @@ export const ui = {
   de: {
     siteTitle: 'Tim Kibele',
     tagline: 'Informatikstudent an der LMU München.',
-    nav: { home: 'Start', projects: 'Projekte', interests: 'Interessen', cv: 'Lebenslauf', legal: 'Datenschutz', achievements: 'Erfolge' },
+    nav: { home: 'Start', projects: 'Projekte', interests: 'Interessen', cv: 'Lebenslauf', legal: 'Datenschutz', achievements: 'Erfolge', menu: 'Menü' },
     home: {
       heading: 'Hallo, ich bin Tim.',
       intro: 'Hier zeige ich, woran ich arbeite und was ich dabei lerne.',
@@ -35,7 +35,7 @@ export const ui = {
   en: {
     siteTitle: 'Tim Kibele',
     tagline: 'Computer science student at LMU Munich.',
-    nav: { home: 'Home', projects: 'Projects', interests: 'Interests', cv: 'CV', legal: 'Privacy', achievements: 'Achievements' },
+    nav: { home: 'Home', projects: 'Projects', interests: 'Interests', cv: 'CV', legal: 'Privacy', achievements: 'Achievements', menu: 'Menu' },
     home: {
       heading: "Hi, I'm Tim.",
       intro: 'Here I share what I work on and what I learn.',
