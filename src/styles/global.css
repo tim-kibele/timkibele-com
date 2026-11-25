@@ -50,7 +50,7 @@ a:hover { text-decoration-color: var(--color-accent); }
 h2 { margin-top: var(--space-2xl); }
 .grid { display: grid; gap: var(--space-md); margin-top: var(--space-md); }
 .card { background: var(--color-paper-2); border-radius: var(--radius-card); padding: var(--space-md) var(--space-lg); }
-.card h3 { margin: 0 0 var(--space-2xs); }
+.card h2 { margin: 0 0 var(--space-2xs); font-size: var(--text-title); }
 .card p { margin: var(--space-2xs) 0 var(--space-sm); }
 .tags { display: flex; flex-wrap: wrap; gap: var(--space-2xs); list-style: none; padding: 0; margin: 0 0 var(--space-sm); }
 .tags li { font-size: var(--text-xs); border: var(--rule-hair) solid var(--color-rule-2); border-radius: var(--radius-pill); padding: 0 var(--space-sm); color: var(--color-muted); }
@@ -315,3 +315,7 @@ h2 { margin-top: var(--space-2xl); }
 .toast a { color: var(--jade-sage); }
 @media (prefers-reduced-motion: no-preference) { .toast { animation: toast-in 400ms var(--ease-out); } }
 @keyframes toast-in { from { opacity: 0; transform: translateY(12px); } }
+
+/* 404 page */
+.notfound p { margin-top: var(--space-md); }
+.notfound .notfound-en { margin-top: var(--space-2xl); }

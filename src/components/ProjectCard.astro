@@ -7,7 +7,7 @@ const { data } = project;
 const tr = t(lang);
 ---
 <article class="card">
-  <h3>{data.detail ? <a href={`/${lang}/projekte/${project.id}/`}>{data.title[lang]}</a> : data.title[lang]}</h3>
+  <h2>{data.detail ? <a href={`/${lang}/projekte/${project.id}/`}>{data.title[lang]}</a> : data.title[lang]}</h2>
   <p>{data.description[lang]}</p>
   {data.tags.length > 0 && <ul class="tags">{data.tags.map((tag) => <li>{tag}</li>)}</ul>}
   <div class="links">
