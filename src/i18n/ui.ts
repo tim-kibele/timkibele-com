@@ -13,7 +13,6 @@ export const ui = {
       more: 'Mehr von mir',
       cvNote: 'Mein Werdegang auf einen Blick.',
       closing: 'Schreib mir.',
-      closingNote: 'Kontaktadresse folgt.',
     },
     projects: { title: 'Projekte', intro: 'Meine Projekte. Hier findest du die Übersicht.', open: 'Öffnen', code: 'Code', motivation: 'Motivation', learnings: 'Learnings', stack: 'Stack' },
     interests: {
@@ -38,7 +37,6 @@ export const ui = {
       more: 'More about me',
       cvNote: 'My background at a glance.',
       closing: 'Get in touch.',
-      closingNote: 'Contact address to follow.',
     },
     projects: { title: 'Projects', intro: 'My projects. Here you will find the overview.', open: 'Open', code: 'Code', motivation: 'Motivation', learnings: 'Learnings', stack: 'Stack' },
     interests: {

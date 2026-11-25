@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Email from '../../components/Email.astro';
 import { languages, t, type Lang } from '../../i18n/ui';
 
 export function getStaticPaths() {
@@ -39,7 +40,7 @@ const rows = [
 
   <section class="closing">
     <h2>{tr.home.closing}</h2>
-    <p>{tr.home.closingNote}</p>
+    <p><Email /></p>
   </section>
   <script is:inline>window.hallmarkSlots = (m) => { for (const [k, v] of Object.entries(m)) { const s = document.querySelector(`[data-slot="${k}"]`); if (!s) continue; const im = new Image(); im.src = typeof v === 'string' ? v : v.src; im.alt = (typeof v === 'object' && v.alt) || s.dataset.alt || ''; s.querySelectorAll(':scope > img').forEach((o) => o.remove()); s.prepend(im); } };
   document.querySelectorAll('[data-slot] img').forEach((i) => { if (i.complete && !i.naturalWidth) i.remove(); else i.addEventListener('error', () => i.remove(), { once: true }); });</script>
