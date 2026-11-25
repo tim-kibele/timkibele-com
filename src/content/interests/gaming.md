@@ -23,7 +23,7 @@ text:
 
     ## Als Nächstes
 
-    Auf meiner Liste stehen Vampire Survivors und Bully.
+    Auf meiner Liste stehen Vampire Survivors und Bully. Ich bin immer offen für Vorschläge :)
   en: |-
     Video games are a welcome break from everyday life and one of my favourite art forms. I play many very different kinds of games.
 
@@ -43,5 +43,5 @@ text:
 
     ## Up next
 
-    Vampire Survivors and Bully are on my list.
+    Vampire Survivors and Bully are on my list. I am always open to suggestions :)
 ---
