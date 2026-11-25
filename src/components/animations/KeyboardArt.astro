@@ -1,78 +1,137 @@
 ---
-// Dekorative Animation für die Tastaturen-Seite: drei kleine Tastaturen untereinander (für die drei
-// Eigenbauten), auf denen immer wieder kurze Tippserien Tasten aufleuchten lassen. Das Layout ist ein
-// allgemeines Muster aus Tastenreihen und sagt nichts über die echten Tastaturen aus.
-// Die Struktur ist festes SVG (sichtbar ohne JavaScript und bei "Bewegung reduzieren"),
-// das Skript lässt nur die Tasten aufleuchten.
+// Dekorative Animation für die Tastaturen-Seite: der Zusammenbau als Schleife. Ein Switch wird
+// geschmiert (Tropfen), die Switches kommen in die Platte, die Keycaps werden aufgesetzt, zum Schluss
+// wird auf der fertigen Tastatur getippt. Das Tastenlayout ist ein allgemeines 60-%-Muster und sagt
+// nichts über die echten Tastaturen aus.
+// Die Struktur ist festes SVG und zeigt die fertige Tastatur (sichtbar ohne JavaScript und bei
+// "Bewegung reduzieren"); das Skript spielt den Aufbau darüber ab.
 const U = 8.8; // Breite einer Taste in Einheiten
 const rows = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
   [1.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1.5],
-  [1.75, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2.25],
+  [1.75, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2.25],
   [2.25, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2.75],
   [1.25, 1.25, 1.25, 6.25, 1.25, 1.25, 1.25, 1.25],
 ];
-const boardsY = [90, 390, 690];
-const litAtStart = [5, 19, 33, 47]; // ein paar Tasten leuchten im Ruhezustand
-const boards = boardsY.map((y0) => {
-  const keys: { x: number; y: number; w: number }[] = [];
-  rows.forEach((row, r) => {
-    let x = 4;
-    row.forEach((w) => {
-      keys.push({ x, y: y0 + r * U, w: w * U - 1.2 });
-      x += w * U;
-    });
+const y0 = 160;
+const keys: { x: number; y: number; w: number; row: number }[] = [];
+rows.forEach((row, r) => {
+  let x = 4;
+  row.forEach((w) => {
+    keys.push({ x, y: y0 + r * U, w: w * U - 1.2, row: r });
+    x += w * U;
   });
-  return { y0, keys };
 });
+const h = U - 1.2;
 ---
-<svg class="margin-art keyboard" viewBox="0 0 140 800" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-  {boards.map((b) => (
-    <g class="board">
-      <rect class="case" x="1" y={b.y0 - 3} width="138" height={rows.length * U + 5} rx="4" />
-      {b.keys.map((k, i) => (
-        <rect class={`key${litAtStart.includes(i) ? ' on' : ''}`} x={k.x} y={k.y} width={k.w} height={U - 1.2} rx="1.4" />
-      ))}
+<svg class="margin-art keyboard" viewBox="0 0 140 260" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+  <g class="lube">
+    <rect class="housing" x="42" y="40" width="56" height="56" rx="6" />
+    <g class="stem">
+      <rect x="66" y="58" width="8" height="20" rx="1.5" />
+      <rect x="60" y="64" width="20" height="8" rx="1.5" />
+    </g>
+    <circle class="drop" cx="70" cy="16" r="4" />
+  </g>
+
+  <rect class="plate" x="1" y={y0 - 3} width="138" height={rows.length * U + 5} rx="4" />
+  {keys.map((k) => (
+    <g class="k" data-row={k.row}>
+      <rect class="hole" x={k.x} y={k.y} width={k.w} height={h} rx="1.4" />
+      <rect class="sw" x={k.x + k.w / 2 - 2.6} y={k.y + h / 2 - 2.6} width="5.2" height="5.2" rx="1" />
+      <rect class="cap" x={k.x} y={k.y} width={k.w} height={h} rx="1.4" />
     </g>
   ))}
+
+  <g class="steps">
+    {[0, 1, 2, 3].map((i) => <circle class="step" cx={49 + i * 14} cy="236" r="2.6" />)}
+  </g>
 </svg>
 
 <script>
   const svg = document.querySelector<SVGSVGElement>('.keyboard');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   if (svg) {
-    const boards = [...svg.querySelectorAll<SVGGElement>('.board')].map((b) => [...b.querySelectorAll<SVGElement>('.key')]);
+    const big = svg.querySelector<SVGGElement>('.lube')!;
+    const drop = svg.querySelector<SVGElement>('.drop')!;
+    const steps = [...svg.querySelectorAll<SVGElement>('.step')];
+    const keys = [...svg.querySelectorAll<SVGGElement>('.k')];
     const wait = (ms: number) => new Promise<void>((res) => setTimeout(res, ms));
     const rand = (a: number, b: number) => a + Math.random() * (b - a);
     let alive = false;
 
-    // Auf einer Tastatur folgen kurze Tippserien aufeinander, dazwischen ruht sie.
-    const type = async (keys: SVGElement[], startDelay: number) => {
-      await wait(startDelay);
+    const setStep = (n: number) => steps.forEach((s, i) => s.classList.toggle('on', i <= n));
+    const reset = () => {
+      big.classList.remove('lubed');
+      keys.forEach((k) => k.classList.remove('in', 'capped', 'lit'));
+      setStep(-1);
+    };
+
+    const loop = async () => {
+      document.documentElement.classList.add('js');
       while (alive) {
         if (svg.getBoundingClientRect().width === 0) {
           await wait(1000);
           continue;
         }
-        const presses = 5 + Math.floor(Math.random() * 9);
+        reset();
+        await wait(900);
+
+        // 1. Switch schmieren: drei Tropfen, danach glänzt der Schaft
+        setStep(0);
+        for (let i = 0; i < 3 && alive; i++) {
+          drop.animate(
+            [{ transform: 'translateY(0)', opacity: 1 }, { transform: 'translateY(46px)', opacity: 1, offset: 0.8 }, { transform: 'translateY(50px)', opacity: 0 }],
+            { duration: 700, easing: 'ease-in' }
+          );
+          await wait(850);
+        }
+        big.classList.add('lubed');
+        await wait(1000);
+
+        // 2. Switches in die Platte setzen
+        setStep(1);
+        for (const k of keys) {
+          if (!alive) return;
+          k.classList.add('in');
+          await wait(24);
+        }
+        await wait(800);
+
+        // 3. Keycaps aufsetzen, Reihe für Reihe
+        setStep(2);
+        for (const k of keys) {
+          if (!alive) return;
+          k.classList.add('capped');
+          await wait(18);
+        }
+        await wait(900);
+
+        // 4. Auf der fertigen Tastatur tippen
+        setStep(3);
+        const presses = 12 + Math.floor(Math.random() * 6);
         for (let i = 0; i < presses && alive; i++) {
           const key = keys[Math.floor(Math.random() * keys.length)];
-          key.classList.add('on');
-          setTimeout(() => key.classList.remove('on'), 150);
-          await wait(rand(90, 210));
+          key.classList.add('lit');
+          setTimeout(() => key.classList.remove('lit'), 160);
+          await wait(rand(100, 230));
         }
-        await wait(rand(1500, 4000));
+        await wait(2200);
       }
     };
 
     const start = () => {
       alive = true;
-      boards.forEach((keys) => keys.forEach((k) => k.classList.remove('on')));
-      boards.forEach((keys, i) => type(keys, i * 700));
+      loop();
+    };
+    const stop = () => {
+      alive = false;
+      document.documentElement.classList.remove('js');
+      reset();
     };
     if (!reduce.matches) start();
     reduce.addEventListener('change', () => {
-      if (reduce.matches) alive = false;
+      if (reduce.matches) stop();
       else if (!alive) start();
     });
   }

@@ -201,7 +201,19 @@ h2 { margin-top: var(--space-2xl); }
 .gamepad .quest.done .box { fill: var(--color-accent); stroke: var(--color-accent); }
 .gamepad .quest.done .tick { opacity: 1; }
 
-/* animation: three small keyboards (Keyboards page) */
-.keyboard .case { fill: none; stroke: var(--color-rule-2); stroke-width: 1; }
-.keyboard .key { fill: var(--color-paper); stroke: var(--color-rule-2); stroke-width: 0.7; transition: fill var(--dur-micro) var(--ease-out), stroke var(--dur-micro) var(--ease-out); }
-.keyboard .key.on { fill: var(--color-accent); stroke: var(--color-accent); }
+/* animation: keyboard build as a loop (Keyboards page) */
+.keyboard .housing { fill: var(--color-paper-2); stroke: var(--color-rule-2); stroke-width: 1.2; }
+.keyboard .stem rect { fill: var(--color-muted); transition: fill var(--dur-long) var(--ease-out); }
+.keyboard .lube.lubed .stem rect { fill: var(--color-accent); }
+.keyboard .drop { fill: var(--color-accent); opacity: 0; }
+.keyboard .plate { fill: var(--color-paper-2); stroke: var(--color-rule-2); stroke-width: 1; }
+.keyboard .hole { fill: var(--color-paper); stroke: var(--color-rule); stroke-width: 0.6; }
+.keyboard .sw { fill: var(--tint-moss); stroke: var(--color-rule-2); stroke-width: 0.6; }
+.keyboard .cap { fill: var(--color-paper); stroke: var(--color-rule-2); stroke-width: 0.7; transition: fill var(--dur-micro) var(--ease-out), stroke var(--dur-micro) var(--ease-out), opacity var(--dur-short) var(--ease-out), transform var(--dur-short) var(--ease-out); }
+.keyboard .k.lit .cap { fill: var(--color-accent); stroke: var(--color-accent); }
+.keyboard .step { fill: none; stroke: var(--color-rule-2); stroke-width: 1; transition: fill var(--dur-short) var(--ease-out); }
+.keyboard .step.on { fill: var(--color-accent); stroke: var(--color-accent); }
+.js .keyboard .sw { opacity: 0; transform: translateY(-10px); transition: opacity var(--dur-short) var(--ease-out), transform var(--dur-short) var(--ease-out); }
+.js .keyboard .k.in .sw { opacity: 1; transform: none; }
+.js .keyboard .cap { opacity: 0; transform: translateY(-14px); }
+.js .keyboard .k.capped .cap { opacity: 1; transform: none; }
