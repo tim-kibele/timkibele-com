@@ -5,7 +5,7 @@ export const ui = {
   de: {
     siteTitle: 'Tim Kibele',
     tagline: 'Informatikstudent an der LMU München.',
-    nav: { home: 'Start', projects: 'Projekte', interests: 'Interessen', cv: 'Lebenslauf', legal: 'Datenschutz', achievements: 'Geheimnisse', menu: 'Menü' },
+    nav: { home: 'Start', projects: 'Projekte', interests: 'Interessen', cv: 'Lebenslauf', legal: 'Datenschutz', imprint: 'Impressum', achievements: 'Geheimnisse', menu: 'Menü' },
     home: {
       heading: 'Hallo, ich bin Tim.',
       intro: 'Hier zeige ich, woran ich arbeite und was ich dabei lerne.',
@@ -28,6 +28,7 @@ export const ui = {
       local: 'Der Fortschritt bleibt in diesem Browser.', reset: 'Zurücksetzen',
     },
     legal: { title: 'Datenschutz' },
+    imprint: { title: 'Impressum' },
     switchTo: 'English',
     theme: { dark: 'Dunkel', light: 'Hell' },
     back: 'Zurück',
@@ -35,7 +36,7 @@ export const ui = {
   en: {
     siteTitle: 'Tim Kibele',
     tagline: 'Computer science student at LMU Munich.',
-    nav: { home: 'Home', projects: 'Projects', interests: 'Interests', cv: 'CV', legal: 'Privacy', achievements: 'Secrets', menu: 'Menu' },
+    nav: { home: 'Home', projects: 'Projects', interests: 'Interests', cv: 'CV', legal: 'Privacy', imprint: 'Legal notice', achievements: 'Secrets', menu: 'Menu' },
     home: {
       heading: "Hi, I'm Tim.",
       intro: 'Here I share what I work on and what I learn.',
@@ -58,6 +59,7 @@ export const ui = {
       local: 'Your progress stays in this browser.', reset: 'Reset',
     },
     legal: { title: 'Privacy policy' },
+    imprint: { title: 'Legal notice' },
     switchTo: 'Deutsch',
     theme: { dark: 'Dark', light: 'Light' },
     back: 'Back',

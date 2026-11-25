@@ -1,0 +1,32 @@
+---
+import Base from '../../../layouts/Base.astro';
+import Email from '../../../components/Email.astro';
+import { languages, t, type Lang } from '../../../i18n/ui';
+
+export function getStaticPaths() {
+  return languages.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+const tr = t(lang);
+---
+<Base lang={lang} title={tr.imprint.title} path="impressum/" description={lang === 'de' ? 'Impressum von Tim Kibele.' : 'Legal notice of Tim Kibele.'}>
+  <h1>{tr.imprint.title}</h1>
+
+  {lang === 'de' ? (
+    <>
+      <h2>Angaben gemäß § 5 DDG</h2>
+      <p>Tim Kibele<br />Wangener Straße 38/1<br />88287 Grünkraut<br />Deutschland</p>
+
+      <h2>Kontakt</h2>
+      <p>E-Mail: <Email /></p>
+    </>
+  ) : (
+    <>
+      <h2>Information according to § 5 DDG</h2>
+      <p>Tim Kibele<br />Wangener Straße 38/1<br />88287 Grünkraut<br />Germany</p>
+
+      <h2>Contact</h2>
+      <p>Email: <Email /></p>
+    </>
+  )}
+</Base>

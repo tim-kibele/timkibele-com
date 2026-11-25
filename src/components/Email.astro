@@ -1,11 +1,11 @@
 ---
-// Kontaktadresse, die nicht im Klartext im HTML steht: Ohne JavaScript erscheint "tim [at] timkibele [dot] info",
+// Kontaktadresse, die nicht im Klartext im HTML steht: Ohne JavaScript erscheint "tim [at] timkibele [dot] com",
 // mit JavaScript ersetzt das Skript sie durch einen mailto-Link. Ein Klick kopiert die Adresse zusätzlich in die
 // Zwischenablage, weil nicht jeder ein Mailprogramm hat. Die Adresse wird hier nur einmal gepflegt.
-const address = 'tim@timkibele.info';
+const address = 'tim@timkibele.com';
 const encoded = Buffer.from(address).toString('base64');
 ---
-<span class="mail" data-e={encoded}>tim [at] timkibele [dot] info</span>
+<span class="mail" data-e={encoded}>tim [at] timkibele [dot] com</span>
 
 <script>
   const copy = async (text: string) => {
