@@ -1,41 +1,40 @@
 ---
-// Dekorative Animation für die KI-Seite: Ein Mensch gibt einen Auftrag an einen Koordinator, der ihn auf drei
-// KI-Agenten verteilt. Ein Prüfer nimmt die Ergebnisse ab und schickt gelegentlich eines zurück.
-// Die Struktur ist festes SVG (sichtbar ohne JavaScript und bei "Bewegung reduzieren"),
-// das Skript lässt nur die Signale laufen.
-const S = 20; // halbe Kantenlänge eines Knotens
+// Dekorative Animation für die KI-Seite als Kreislauf: Ein Mensch gibt einen Auftrag an einen
+// Koordinator, der ihn auf drei KI-Agenten verteilt. Das Ergebnis läuft zum Menschen zurück, der es
+// prüft und gelegentlich eine Korrektur anstößt. Die Struktur ist festes SVG (sichtbar ohne
+// JavaScript und bei "Bewegung reduzieren"), das Skript lässt nur die Signale laufen.
 const nodes = [
-  { id: 'A', x: 70, y: 60, icon: 'person' },
-  { id: 'B', x: 70, y: 210, icon: 'split' },
-  { id: 'C1', x: 22, y: 360, icon: 'robot' },
-  { id: 'C2', x: 70, y: 360, icon: 'robot' },
-  { id: 'C3', x: 118, y: 360, icon: 'robot' },
-  { id: 'D', x: 70, y: 510, icon: 'review' },
-  { id: 'E', x: 70, y: 660, icon: 'done' },
+  { id: 'A', x: 70, y: 60, s: 20, icon: 'person' },
+  { id: 'B', x: 70, y: 250, s: 20, icon: 'split' },
+  { id: 'C1', x: 34, y: 440, s: 16, icon: 'robot' },
+  { id: 'C2', x: 70, y: 440, s: 16, icon: 'robot' },
+  { id: 'C3', x: 106, y: 440, s: 16, icon: 'robot' },
+  { id: 'D', x: 70, y: 630, s: 20, icon: 'done' },
 ];
-const links = ['A-B', 'B-C1', 'B-C2', 'B-C3', 'C1-D', 'C2-D', 'C3-D', 'D-E'];
+const links = ['A-B', 'B-C1', 'B-C2', 'B-C3', 'C1-D', 'C2-D', 'C3-D'];
 const by = Object.fromEntries(nodes.map((n) => [n.id, n]));
 const edges = links.map((key) => {
   const [a, b] = key.split('-').map((id) => by[id]);
-  const y1 = a.y + S, y2 = b.y - S, ym = (y1 + y2) / 2;
+  const y1 = a.y + a.s, y2 = b.y - b.s, ym = (y1 + y2) / 2;
   return { key, d: `M${a.x} ${y1} C${a.x} ${ym} ${b.x} ${ym} ${b.x} ${y2}` };
 });
+// Rückweg vom Ergebnis zum Menschen, links an den Agenten vorbei.
+edges.push({ key: 'D-A', d: 'M50 630 H10 Q4 630 4 624 V66 Q4 60 10 60 H50' });
 const icons: Record<string, string> = {
-  person: '<path d="M-7 -3 H7 M-4 -3 V-7.5 H4 V-3"/><circle cx="0" cy="1" r="2.2"/><path d="M-6 8 V7 C-6 5.4 -3 4.8 0 4.8 C3 4.8 6 5.4 6 7 V8 M-2 5 L0 7 L2 5"/>',
+  person: '<circle cx="0" cy="-3" r="3.2"/><path d="M-7 8 V6 C-7 3.5 -3.5 2.8 0 2.8 C3.5 2.8 7 3.5 7 6 V8 M-2.2 3.2 L0 6.5 L2.2 3.2 M0 6.5 V8"/>',
   split: '<circle cx="0" cy="-5" r="2"/><circle cx="-6" cy="5" r="2"/><circle cx="6" cy="5" r="2"/><path d="M0 -3 V0 M0 0 L-6 3 M0 0 L6 3"/>',
   robot: '<path d="M-4 -4 H4 A2 2 0 0 1 6 -2 V3 A2 2 0 0 1 4 5 H-4 A2 2 0 0 1 -6 3 V-2 A2 2 0 0 1 -4 -4 Z M0 -4 V-6.5 M-8 -0.5 V2.5 M8 -0.5 V2.5 M-2.5 3 H2.5"/><circle class="dot" cx="0" cy="-7" r="1"/><circle class="dot" cx="-2.3" cy="0.5" r="1"/><circle class="dot" cx="2.3" cy="0.5" r="1"/>',
-  review: '<circle cx="-2" cy="-2" r="5"/><path d="M2 2 L7 7"/>',
   done: '<path d="M-7 0 L-2 5 L7 -6"/>',
 };
 ---
-<svg class="margin-art agents" viewBox="0 0 140 780" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+<svg class="margin-art agents" viewBox="0 0 140 700" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
   <g>
     {edges.map((e) => <path class="edge" data-e={e.key} d={e.d} />)}
   </g>
   <g>
     {nodes.map((n) => (
       <g class="wf-node" data-n={n.id} transform={`translate(${n.x} ${n.y})`}>
-        <rect x={-S} y={-S} width={S * 2} height={S * 2} rx="8" />
+        <rect x={-n.s} y={-n.s} width={n.s * 2} height={n.s * 2} rx="8" />
         <g class="wf-icon" transform="scale(1.2)" set:html={icons[n.icon]} />
       </g>
     ))}
@@ -61,21 +60,21 @@ const icons: Record<string, string> = {
       setTimeout(() => el.classList.remove('on'), ms);
     };
 
-    // Ein Signal läuft entlang einer Kante, vorwärts oder rückwärts (ein Agent wird zurückgeschickt).
-    const pulse = (key: string, back = false) =>
+    // Ein Signal läuft entlang einer Kante von ihrem Anfang bis zu ihrem Ende.
+    const pulse = (key: string) =>
       new Promise<void>((res) => {
         const edge = edgeEl[key];
         const el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         el.setAttribute('r', '3.6');
-        el.setAttribute('class', back ? 'pulse back' : 'pulse');
+        el.setAttribute('class', 'pulse');
         layer.appendChild(el);
         edge.classList.add('on');
         const len = edge.getTotalLength();
-        const dur = Math.min(1000, Math.max(450, len / 0.18));
+        const dur = Math.min(1400, Math.max(450, len / 0.18));
         const start = performance.now();
         const step = (now: number) => {
           const t = Math.min(1, (now - start) / dur);
-          const p = edge.getPointAtLength((back ? 1 - t : t) * len);
+          const p = edge.getPointAtLength(t * len);
           el.setAttribute('transform', `translate(${p.x} ${p.y})`);
           if (t < 1 && alive) requestAnimationFrame(step);
           else {
@@ -86,6 +85,23 @@ const icons: Record<string, string> = {
         };
         requestAnimationFrame(step);
       });
+
+    // Ein Agent arbeitet an der Aufgabe und liefert sein Ergebnis beim Ergebnisknoten ab.
+    const work = async (id: string, delay = 0) => {
+      await wait(delay);
+      await pulse(`B-${id}`);
+      on(nodeEl[id], rand(900, 1700));
+      await wait(rand(900, 1700));
+      await pulse(`${id}-D`);
+      on(nodeEl.D, 700);
+    };
+    // Das Ergebnis geht zurück zum Menschen, der es prüft.
+    const review = async () => {
+      await wait(400);
+      await pulse('D-A');
+      on(nodeEl.A, 1400);
+      await wait(1400);
+    };
 
     const play = async () => {
       alive = true;
@@ -98,33 +114,18 @@ const icons: Record<string, string> = {
         await pulse('A-B');
         on(nodeEl.B, 900);
         await wait(250);
+        await Promise.all(['C1', 'C2', 'C3'].map((id, i) => work(id, i * 160)));
+        await review();
 
-        // Die drei Agenten arbeiten gleichzeitig und melden sich nacheinander.
-        await Promise.all(
-          ['C1', 'C2', 'C3'].map(async (id, i) => {
-            await wait(i * 160);
-            await pulse(`B-${id}`);
-            on(nodeEl[id], rand(900, 1700));
-            await wait(rand(900, 1700));
-            await pulse(`${id}-D`);
-            on(nodeEl.D, 700);
-          }),
-        );
-
-        // Der Prüfer nimmt ab. Manchmal geht ein Ergebnis zurück an den Agenten.
-        await wait(500);
+        // Manchmal ist das Ergebnis nicht gut genug: Der Mensch schickt einen Agenten noch einmal los.
         if (Math.random() < 0.4) {
-          const id = `C${1 + Math.floor(Math.random() * 3)}`;
-          await pulse(`${id}-D`, true);
-          on(nodeEl[id], 1300);
-          await wait(1300);
-          await pulse(`${id}-D`);
-          on(nodeEl.D, 700);
-          await wait(500);
+          on(nodeEl.A, 900);
+          await pulse('A-B');
+          on(nodeEl.B, 900);
+          await work(`C${1 + Math.floor(Math.random() * 3)}`);
+          await review();
         }
-        await pulse('D-E');
-        on(nodeEl.E, 1400);
-        await wait(rand(1800, 2800));
+        await wait(rand(1200, 2000));
       }
     };
 
