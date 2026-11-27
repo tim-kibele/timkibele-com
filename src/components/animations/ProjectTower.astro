@@ -1,10 +1,10 @@
 ---
 // Dekorative Animation für die Projekt-Übersicht: ein Steinturm in den Farben der Seite, ein Stein pro Projekt.
 // Die Steine kommen aus der Projekt-Sammlung, ein neues Projekt bekommt also automatisch seinen Stein. Sie liegen
-// in der Reihenfolge der Karten von unten nach oben: die letzte Karte unten, die erste oben. Die Zeichenfläche
-// ist genau so hoch wie der Turm; er füllt so die Bühne, und mit mehr Projekten werden die Steine von selbst kleiner.
+// in der Reihenfolge der Karten: die letzte Karte unten, die erste oben. Das Skript misst die Karten: Jeder Stein
+// liegt auf Höhe seiner Karte und ist so hoch wie sie, die Steine berühren sich also und bilden weiter einen Turm.
 // Beim Laden legt sich der Turm einmal Stein für Stein auf; wer über eine Karte fährt oder sie fokussiert, hebt
-// ihren Stein hervor. Die Struktur ist festes SVG mit fertigem Turm (sichtbar ohne JavaScript und bei
+// ihren Stein hervor. Die Struktur ist festes SVG mit fertigem, kompaktem Turm (sichtbar ohne JavaScript und bei
 // "Bewegung reduzieren").
 interface Props { ids: string[] }
 const { ids } = Astro.props;
@@ -23,7 +23,7 @@ const stones = [...ids].reverse().map((id, i) => ({
   color: colors[i % colors.length],
 }));
 ---
-<svg class="margin-art pebbles tower" viewBox={`0 0 140 ${height}`} preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false">
+<svg class="margin-art pebbles tower" viewBox={`0 0 140 ${height}`} preserveAspectRatio="xMidYMin meet" aria-hidden="true" focusable="false">
   {stones.map((s) => <ellipse class={`pebble pebble--${s.color}`} data-project={s.id} cx={s.cx} cy={s.cy} rx={s.w / 2} ry={ry} />)}
 </svg>
 
@@ -32,8 +32,32 @@ const stones = [...ids].reverse().map((id, i) => ({
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   if (svg) {
     const stones = [...svg.querySelectorAll<SVGEllipseElement>('.pebble')];
+    const cardOf = (s: SVGEllipseElement) => document.querySelector<HTMLElement>(`.card[data-project="${s.dataset.project}"]`);
+
+    // Jeder Stein mittig neben seiner Karte und so hoch wie sie (plus der halbe Abstand zur nächsten Karte).
+    const layout = () => {
+      const w = svg.getBoundingClientRect().width;
+      if (w === 0) return;
+      const scale = w / 140;
+      const top = svg.getBoundingClientRect().top;
+      const gap = parseFloat(getComputedStyle(document.querySelector('.grid')!).rowGap) || 0;
+      let end = 0;
+      for (const s of stones) {
+        const r = cardOf(s)?.getBoundingClientRect();
+        if (!r) continue;
+        s.setAttribute('cy', String((r.top + r.height / 2 - top) / scale));
+        s.setAttribute('ry', String(Math.max(4, (r.height / 2 + gap / 2) / scale - 1)));
+        end = Math.max(end, (r.bottom - top) / scale);
+      }
+      if (end) svg.setAttribute('viewBox', `0 0 140 ${end + 6}`);
+    };
+    layout();
+    addEventListener('load', layout);
+    addEventListener('resize', layout);
+    new ResizeObserver(layout).observe(document.body);
+
     for (const stone of stones) {
-      const card = document.querySelector<HTMLElement>(`.card[data-project="${stone.dataset.project}"]`);
+      const card = cardOf(stone);
       if (!card) continue;
       const on = (v: boolean) => () => stone.classList.toggle('on', v);
       card.addEventListener('mouseenter', on(true));
