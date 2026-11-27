@@ -1,0 +1,16 @@
+---
+// Dekorative Animation für die 404-Seite: ein Steinturm in den Farben der Seite (wie auf der Projektseite
+// "Diese Website"), dem der oberste Stein fehlt. Er wackelt, kippt und fällt neben den Turm. Die Bewegung kommt
+// allein aus CSS; der Endzustand (Stein liegt neben dem Turm) ist auch der Zustand bei "Bewegung reduzieren".
+const colors = ['ink', 'moss', 'slate', 'sage', 'grey'];
+const widths = [80, 70, 74, 64, 66, 56, 58, 48];
+const shift = [0, -4, 3, -3, 4, -2, 2, -1];
+const pitch = 40;
+const base = 694;
+const stones = widths.map((w, i) => ({ w, cx: 52 + shift[i], cy: base - 18 - i * pitch, color: colors[i % colors.length] }));
+const top = { w: 40, cx: 52, cy: base - 18 - widths.length * pitch, color: colors[widths.length % colors.length] };
+---
+<svg class="margin-art pebbles lost" viewBox="0 0 140 700" preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false">
+  {stones.map((s) => <ellipse class={`pebble pebble--${s.color}`} cx={s.cx} cy={s.cy} rx={s.w / 2} ry="18" />)}
+  <ellipse class={`pebble pebble--${top.color} falling`} cx={top.cx} cy={top.cy} rx={top.w / 2} ry="18" style={`--dx:${112 - top.cx}px;--dy:${base - 18 - top.cy}px`} />
+</svg>

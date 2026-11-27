@@ -1,5 +1,6 @@
 ---
 import Base from '../../../layouts/Base.astro';
+import CvGraph from '../../../components/animations/CvGraph.astro';
 import { languages, t, type Lang } from '../../../i18n/ui';
 
 export function getStaticPaths() {
@@ -65,12 +66,11 @@ const sections = [
 ] as const;
 ---
 <Base lang={lang} title={tr.cv.title} description={cv.profile} path="lebenslauf/">
-  <div class="split split--title">
-  <div class="split-art">
-    <p class="print-name">Tim Kibele · www.timkibele.com</p>
-    <h1>{tr.cv.title}</h1>
-  </div>
+  <div class="split">
+  <div class="split-art"><CvGraph /></div>
   <div class="split-text">
+  <p class="print-name">Tim Kibele · www.timkibele.com</p>
+  <h1>{tr.cv.title}</h1>
   <p class="lead">{cv.profile}</p>
   <p class="cv-actions"><a class="btn" href={`/${tr.cv.pdfFile}`} download>{tr.cv.pdf}</a></p>
 

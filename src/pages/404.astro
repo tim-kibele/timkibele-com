@@ -2,11 +2,13 @@
 // GitHub Pages liefert diese Seite für jede unbekannte Adresse aus. Die Sprache lässt sich dort nicht erkennen,
 // deshalb steht der Hinweis auf Deutsch und Englisch da.
 import Base from '../layouts/Base.astro';
+import LostStone from '../components/animations/LostStone.astro';
 ---
 <Base lang="de" title="Seite nicht gefunden" path="">
-  <div class="split split--title notfound">
-  <div class="split-art"><h1>Seite nicht gefunden</h1></div>
+  <div class="split notfound">
+  <div class="split-art"><LostStone /></div>
   <div class="split-text">
+  <h1>Seite nicht gefunden</h1>
   <p class="lead">Die Adresse stimmt nicht, oder die Seite gibt es nicht mehr.</p>
   <p><a class="btn btn--primary" href="/de/">Zur Startseite</a></p>
   <p lang="en" class="lead notfound-en">Page not found. The address is wrong, or the page no longer exists.</p>

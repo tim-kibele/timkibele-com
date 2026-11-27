@@ -1,0 +1,124 @@
+---
+// Dekorative Animation für den Lebenslauf: ein Commit-Graph. Jede Station aus Berufserfahrung und Ausbildung
+// ist ein Commit auf einer Linie, auf Höhe ihres Eintrags (das Skript misst die Zeilen). Berufserfahrung als
+// gefüllter Punkt, Ausbildung als Ring. Neben jedem Punkt steht ein Balken wie eine Commit-Zeile, so lang wie
+// der Titel des Eintrags. Oben steht HEAD. Die Linie zeichnet sich von oben nach unten, dann läuft ab und zu
+// ein Signal vom ältesten Eintrag nach oben zu HEAD.
+// Die Struktur ist festes SVG und zeigt den fertigen Graphen (sichtbar ohne JavaScript und bei
+// "Bewegung reduzieren"); das Skript richtet ihn an den Zeilen aus und lässt ihn sich aufbauen.
+const X = 30;
+const staticRows = [
+  { y: 120, edu: false, len: 40 },
+  { y: 200, edu: false, len: 22 },
+  { y: 330, edu: true, len: 70 },
+  { y: 410, edu: true, len: 46 },
+];
+const top = 60;
+const end = staticRows[staticRows.length - 1].y;
+---
+<svg class="margin-art cvgraph" viewBox={`0 0 140 ${end + 40}`} preserveAspectRatio="xMidYMin meet" aria-hidden="true" focusable="false">
+  <text class="head" x={X + 14} y={top + 4}>HEAD</text>
+  <path class="lane" d={`M${X} ${top} V${end}`} />
+  <path class="lane-fill" d={`M${X} ${top} V${end}`} pathLength="1" />
+  {staticRows.map((r) => (
+    <g class={r.edu ? 'commit edu in' : 'commit in'} transform={`translate(0 ${r.y})`}>
+      <rect class="msg" x={X + 16} y="-2" width={r.len} height="4" rx="2" />
+      <circle cx={X} cy="0" r="6" />
+    </g>
+  ))}
+  <circle class="pulse" cx={X} cy="0" r="3.5" />
+</svg>
+
+<script>
+  const svg = document.querySelector<SVGSVGElement>('.cvgraph');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  if (svg) {
+    const X = 30;
+    const lane = svg.querySelector<SVGPathElement>('.lane')!;
+    const fill = svg.querySelector<SVGPathElement>('.lane-fill')!;
+    const head = svg.querySelector<SVGTextElement>('.head')!;
+    const pulse = svg.querySelector<SVGCircleElement>('.pulse')!;
+    const commits = [...svg.querySelectorAll<SVGGElement>('.commit')];
+    // Die Einträge aus Berufserfahrung und Ausbildung, in der Reihenfolge der Seite
+    const rows = [...document.querySelectorAll('.cv section')].slice(0, 2).flatMap((s) => [...s.querySelectorAll('.cv-row')]);
+    const wait = (ms: number) => new Promise<void>((res) => setTimeout(res, ms));
+    let ys: number[] = [];
+    let alive = false;
+
+    const layout = () => {
+      const w = svg.getBoundingClientRect().width;
+      if (w === 0 || rows.length !== commits.length) return;
+      const scale = w / 140;
+      const svgTop = svg.getBoundingClientRect().top;
+      const next = rows.map((row) => {
+        const h = row.querySelector('h3')!.getBoundingClientRect();
+        return (h.top + h.height / 2 - svgTop) / scale;
+      });
+      if (next.some((y, i) => i > 0 && y <= next[i - 1])) return; // Liste ausgeblendet (git log): Lage behalten
+      ys = next;
+      const top = Math.max(20, ys[0] - 60);
+      const end = ys[ys.length - 1];
+      commits.forEach((c, i) => {
+        c.setAttribute('transform', `translate(0 ${ys[i]})`);
+        const title = rows[i].querySelector('h3')!.textContent!.trim().length;
+        c.querySelector('.msg')!.setAttribute('width', String(Math.min(96, 8 + title * 1.4)));
+      });
+      for (const p of [lane, fill]) p.setAttribute('d', `M${X} ${top} V${end}`);
+      head.setAttribute('y', String(top + 4));
+      svg.setAttribute('viewBox', `0 0 140 ${end + 40}`);
+    };
+
+    // Ein Signal läuft vom ältesten Eintrag hinauf zu HEAD.
+    const push = () =>
+      new Promise<void>((res) => {
+        const from = ys[ys.length - 1];
+        const to = ys[0] - 60;
+        const dur = 2200;
+        const start = performance.now();
+        pulse.classList.add('on');
+        const step = (now: number) => {
+          const t = Math.min(1, (now - start) / dur);
+          const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+          pulse.setAttribute('cy', String(from + (to - from) * e));
+          if (t < 1 && alive) requestAnimationFrame(step);
+          else {
+            pulse.classList.remove('on');
+            res();
+          }
+        };
+        requestAnimationFrame(step);
+      });
+
+    const play = async () => {
+      alive = true;
+      svg.classList.add('live');
+      commits.forEach((c) => c.classList.remove('in'));
+      fill.style.strokeDashoffset = '1';
+      await wait(500);
+      fill.style.strokeDashoffset = '0';
+      for (const c of commits) {
+        await wait(260);
+        if (!alive) return;
+        c.classList.add('in');
+      }
+      while (alive) {
+        await wait(2600);
+        if (!alive || svg.getBoundingClientRect().width === 0) continue;
+        await push();
+      }
+    };
+    const stop = () => {
+      alive = false;
+      svg.classList.remove('live');
+      fill.style.removeProperty('stroke-dashoffset');
+      commits.forEach((c) => c.classList.add('in'));
+    };
+
+    layout();
+    addEventListener('load', layout);
+    addEventListener('resize', layout);
+    new ResizeObserver(layout).observe(document.body);
+    if (!reduce.matches) play();
+    reduce.addEventListener('change', () => (reduce.matches ? stop() : !alive && play()));
+  }
+</script>

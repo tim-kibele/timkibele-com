@@ -48,7 +48,7 @@ a:hover { text-decoration-color: var(--color-accent); }
 /* shared with the subpages */
 .lead { color: var(--color-muted); }
 h2 { margin-top: var(--space-2xl); }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr)); gap: var(--space-md); margin-top: var(--space-xl); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr)); gap: var(--space-md); margin-top: var(--space-xl); }
 .card { background: var(--color-paper-2); border-radius: var(--radius-card); padding: var(--space-md) var(--space-lg); }
 .card h2 { margin: 0 0 var(--space-2xs); font-size: var(--text-title); }
 .card p { margin: var(--space-2xs) 0 var(--space-sm); }
@@ -167,12 +167,12 @@ h2 { margin-top: var(--space-2xl); }
   /* the text keeps its own height (the music equalizer measures it; stretching it would feed back) */
   .split-text { grid-column: 2; align-self: start; padding: var(--space-3xl) clamp(var(--space-xl), 5vw, var(--space-3xl)) var(--space-4xl); }
   .split-art:has(> .margin-art) { position: relative; display: flex; justify-content: center; align-items: flex-start; padding: var(--space-3xl) var(--space-lg); }
-  /* the page-long animations (gaming, keyboards, music) measure the text and grow with it */
+  /* the page-long animations (gaming, keyboards, music, CV, interests overview) measure the text and grow with it */
   .split .margin-art { display: block; flex: none; width: clamp(14rem, 20vw, 30rem); max-width: 100%; height: auto; }
   .split .keyboard { width: clamp(16rem, 26vw, 36rem); }
   /* animations with a fixed drawing fill the whole stage, as large as their proportions allow, and scroll with
    * the page; absolute so they never make the page longer than the text */
-  .split .margin-art:not(.gamepad, .keyboard, .equalizer) { position: absolute; top: var(--space-3xl); left: var(--space-lg); width: calc(100% - 2 * var(--space-lg)); height: calc(100% - 2 * var(--space-3xl)); max-width: none; }
+  .split .margin-art:not(.gamepad, .keyboard, .equalizer, .cvgraph, .marks) { position: absolute; top: var(--space-3xl); left: var(--space-lg); width: calc(100% - 2 * var(--space-lg)); height: calc(100% - 2 * var(--space-3xl)); max-width: none; }
   .split--title .split-art { padding: var(--space-3xl) var(--edge); }
   .split--title .split-art h1 { position: sticky; top: var(--space-3xl); }
 }
@@ -404,3 +404,54 @@ h2 { margin-top: var(--space-2xl); }
 .pebbles .pebble--grey { fill: var(--jade-grey); }
 .pebbles .pebble { transition: opacity var(--dur-long) var(--ease-out), transform var(--dur-long) var(--ease-out); }
 html.js .pebbles .pebble.out { opacity: 0; transform: translateY(-90px); }
+
+/* animation: project tower (projects overview), one stone per project */
+.tower .pebble { transform-box: fill-box; transform-origin: center; transition: opacity var(--dur-long) var(--ease-out), transform var(--dur-long) var(--ease-out), stroke var(--dur-short) var(--ease-out); }
+.tower.live .pebble.out { opacity: 0; transform: translateY(-90px); }
+.tower .pebble.on { stroke: var(--color-accent); stroke-width: 2.5; transform: translateX(8px) scale(1.06); }
+
+/* animation: lost stone (404 page); the last keyframe is also the still state for reduced motion */
+.lost .falling { transform-box: fill-box; transform-origin: center; animation: stone-fall 7s var(--ease-in-out) infinite both; }
+@keyframes stone-fall {
+  0% { opacity: 0; transform: none; }
+  6%, 30% { opacity: 1; transform: none; }
+  35% { transform: rotate(-7deg); }
+  40% { transform: rotate(6deg); }
+  46% { transform: translate(10px, -6px) rotate(20deg); animation-timing-function: var(--ease-in); }
+  66% { transform: translate(var(--dx), var(--dy)) rotate(180deg); animation-timing-function: var(--ease-out); }
+  71% { transform: translate(var(--dx), calc(var(--dy) - 10px)) rotate(180deg); animation-timing-function: var(--ease-in); }
+  76%, 100% { opacity: 1; transform: translate(var(--dx), var(--dy)) rotate(180deg); }
+}
+
+/* animation: commit graph (CV page) */
+.cvgraph .lane { fill: none; stroke: var(--color-rule-2); stroke-width: 2; }
+.cvgraph .lane-fill { fill: none; stroke: var(--color-accent); stroke-width: 2; stroke-dasharray: 1; stroke-dashoffset: 0; }
+.cvgraph.live .lane-fill { transition: stroke-dashoffset 1400ms var(--ease-out); }
+.cvgraph .commit circle { fill: var(--color-accent); stroke: var(--color-accent); stroke-width: 2; }
+.cvgraph .commit.edu circle { fill: var(--color-paper); }
+.cvgraph .msg { fill: var(--tint-moss); }
+.cvgraph .head { font-family: var(--font-body); font-size: 11px; fill: var(--color-muted); }
+.cvgraph .pulse { fill: var(--color-accent); opacity: 0; }
+.cvgraph .pulse.on { opacity: 1; }
+.cvgraph.live .commit { opacity: 0; transform-box: fill-box; transition: opacity var(--dur-long) var(--ease-out); }
+.cvgraph.live .commit.in { opacity: 1; }
+
+/* animation: motifs beside the interests overview */
+.split-text .topics { margin-top: var(--space-xl); }
+.marks .mark { color: var(--color-muted); transition: color var(--dur-short) var(--ease-out); }
+.marks .mark-body { transition: transform var(--dur-short) var(--ease-out); }
+.marks .frame { fill: var(--color-paper); stroke: var(--color-rule-2); stroke-width: 1; transition: stroke var(--dur-short) var(--ease-out); }
+.marks .icon { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.marks .icon .dot { fill: currentColor; stroke: none; }
+.marks .mark.on { color: var(--color-accent); }
+.marks .mark.on .frame { stroke: var(--color-accent); }
+.marks .mark.on .mark-body { transform: scale(1.12); }
+.marks .bar { transform-box: fill-box; transform-origin: center bottom; }
+.marks .mark.on .bar { animation: mark-eq 650ms ease-in-out infinite alternate; }
+.marks .mark.on .bar:nth-child(2) { animation-delay: -200ms; }
+.marks .mark.on .bar:nth-child(3) { animation-delay: -420ms; }
+.marks .mark.on .bar:nth-child(4) { animation-delay: -90ms; }
+.marks .heart { transform-box: fill-box; transform-origin: center; }
+.marks .mark.on .heart { animation: mark-beat 900ms ease-in-out infinite; }
+@keyframes mark-beat { 0%, 40%, 100% { transform: scale(1); } 15% { transform: scale(1.16); } 28% { transform: scale(0.96); } }
+@keyframes mark-eq { from { transform: scaleY(0.45); } to { transform: scaleY(1); } }

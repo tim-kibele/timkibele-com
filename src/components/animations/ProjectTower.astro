@@ -1,0 +1,51 @@
+---
+// Dekorative Animation für die Projekt-Übersicht: ein Steinturm in den Farben der Seite, ein Stein pro Projekt.
+// Die Steine kommen aus der Projekt-Sammlung, ein neues Projekt bekommt also automatisch seinen Stein. Sie liegen
+// in der Reihenfolge der Karten von unten nach oben: die letzte Karte unten, die erste oben. Die Zeichenfläche
+// ist genau so hoch wie der Turm; er füllt so die Bühne, und mit mehr Projekten werden die Steine von selbst kleiner.
+// Beim Laden legt sich der Turm einmal Stein für Stein auf; wer über eine Karte fährt oder sie fokussiert, hebt
+// ihren Stein hervor. Die Struktur ist festes SVG mit fertigem Turm (sichtbar ohne JavaScript und bei
+// "Bewegung reduzieren").
+interface Props { ids: string[] }
+const { ids } = Astro.props;
+const colors = ['ink', 'moss', 'slate', 'sage', 'grey'];
+const shift = [0, -6, 5, -4, 6, -3, 4, -5, 3, -2, 2, -1];
+const n = ids.length;
+const ry = 21;
+const pitch = ry * 2 + 4;
+const height = Math.max(240, n * pitch + 24);
+const base = height - 6;
+const stones = [...ids].reverse().map((id, i) => ({
+  id,
+  w: n === 1 ? 96 : 108 - (i * 60) / Math.max(n - 1, 1),
+  cx: 70 + shift[i % shift.length],
+  cy: base - ry - i * pitch,
+  color: colors[i % colors.length],
+}));
+---
+<svg class="margin-art pebbles tower" viewBox={`0 0 140 ${height}`} preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false">
+  {stones.map((s) => <ellipse class={`pebble pebble--${s.color}`} data-project={s.id} cx={s.cx} cy={s.cy} rx={s.w / 2} ry={ry} />)}
+</svg>
+
+<script>
+  const svg = document.querySelector<SVGSVGElement>('.tower');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  if (svg) {
+    const stones = [...svg.querySelectorAll<SVGEllipseElement>('.pebble')];
+    for (const stone of stones) {
+      const card = document.querySelector<HTMLElement>(`.card[data-project="${stone.dataset.project}"]`);
+      if (!card) continue;
+      const on = (v: boolean) => () => stone.classList.toggle('on', v);
+      card.addEventListener('mouseenter', on(true));
+      card.addEventListener('mouseleave', on(false));
+      card.addEventListener('focusin', on(true));
+      card.addEventListener('focusout', on(false));
+    }
+    // Einmal beim Laden: die Steine legen sich von unten nach oben auf.
+    if (!reduce.matches) {
+      svg.classList.add('live');
+      stones.forEach((s) => s.classList.add('out'));
+      stones.forEach((s, i) => setTimeout(() => s.classList.remove('out'), 400 + i * 260));
+    }
+  }
+</script>
