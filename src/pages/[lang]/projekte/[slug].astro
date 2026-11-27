@@ -14,15 +14,14 @@ const { project } = Astro.props;
 const tr = t(lang);
 const d = project.data.detail![lang];
 const Animation = project.data.animation ? animations[project.data.animation] : null;
-// Mit Animation: breites Layout, große Animation links, Text rechts. Ohne Animation: schmale einspaltige Seite.
-const split = Animation !== null;
+// Mit Animation steht sie auf der Bühne links, sonst der Seitentitel.
 ---
-<Base lang={lang} title={project.data.title[lang]} description={project.data.description[lang]} path={`projekte/${slug}/`} wide={split}>
-  <div class={split ? 'split' : undefined}>
-  {Animation && (split ? <div class="split-art"><Animation /></div> : <Animation />)}
-  <div class={split ? 'split-text' : undefined}>
+<Base lang={lang} title={project.data.title[lang]} description={project.data.description[lang]} path={`projekte/${slug}/`}>
+  <div class={Animation ? 'split' : 'split split--title'}>
+  <div class="split-art">{Animation ? <Animation /> : <h1>{project.data.title[lang]}</h1>}</div>
+  <div class="split-text">
   <p><a href={`/${lang}/projekte/`}>← {tr.back}</a></p>
-  <h1>{project.data.title[lang]}</h1>
+  {Animation && <h1>{project.data.title[lang]}</h1>}
   <p class="lead">{d.summary}</p>
 
   <section class="detail">

@@ -17,18 +17,18 @@ const rows = [
 ];
 ---
 <Base lang={lang} path="">
+  <div class="split split--portrait">
+  <figure class="split-art portrait">
+    <Image src={portrait} alt={tr.home.portraitAlt} width={1600} widths={[480, 800, 1100, 1600]} sizes="(min-width: 64rem) 45vw, 100vw" format="webp" quality={82} loading="eager" fetchpriority="high" />
+  </figure>
+  <div class="split-text">
   <section class="about">
-    <div>
-      <h1>{tr.home.heading}</h1>
-      <p class="lead">{tr.home.intro}</p>
-      <div class="actions">
-        <a class="btn btn--primary" href={`/${lang}/lebenslauf/`}>{tr.nav.cv}</a>
-        <a class="btn" href={`/${lang}/projekte/`}>{tr.nav.projects}</a>
-      </div>
+    <h1>{tr.home.heading}</h1>
+    <p class="lead">{tr.home.intro}</p>
+    <div class="actions">
+      <a class="btn btn--primary" href={`/${lang}/lebenslauf/`}>{tr.nav.cv}</a>
+      <a class="btn" href={`/${lang}/projekte/`}>{tr.nav.projects}</a>
     </div>
-    <figure class="portrait">
-      <Image src={portrait} alt={tr.home.portraitAlt} width={1100} widths={[400, 800, 1100]} sizes="(min-width: 64rem) 380px, 100vw" format="webp" quality={82} loading="eager" fetchpriority="high" />
-    </figure>
   </section>
 
   <section class="more">
@@ -44,4 +44,6 @@ const rows = [
     <h2>{tr.home.closing}</h2>
     <p><Email /></p>
   </section>
+  </div>
+  </div>
 </Base>

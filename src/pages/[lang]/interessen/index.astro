@@ -11,7 +11,9 @@ const tr = t(lang);
 const items = (await getCollection('interests')).sort((a, b) => a.data.title[lang].localeCompare(b.data.title[lang], lang));
 ---
 <Base lang={lang} title={tr.interests.title} description={tr.interests.intro} path="interessen/">
-  <h1>{tr.interests.title}</h1>
+  <div class="split split--title">
+  <div class="split-art"><h1>{tr.interests.title}</h1></div>
+  <div class="split-text">
   <p class="lead">{tr.interests.intro}</p>
 
   <ul class="index topics">
@@ -19,4 +21,6 @@ const items = (await getCollection('interests')).sort((a, b) => a.data.title[lan
       <li><a href={`/${lang}/interessen/${i.id}/`}><span class="name">{i.data.title[lang]}</span></a></li>
     ))}
   </ul>
+  </div>
+  </div>
 </Base>

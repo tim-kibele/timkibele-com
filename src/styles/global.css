@@ -12,18 +12,18 @@
 body { font-variant-numeric: oldstyle-nums; color: var(--color-ink-2); }
 h1, h2, h3 { color: var(--color-ink); }
 
-/* layout */
-.wrap { width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); }
-main { padding-block: var(--space-2xl) var(--space-3xl); }
+/* layout: header and footer run edge to edge, every page below is a split (see "the stage") */
+:root { --edge: clamp(16px, 3.2vw, 56px); }
+.bar { padding-inline: var(--edge); }
 header.site { border-bottom: var(--rule-hair) solid var(--color-rule); }
-header.site .wrap { display: flex; flex-wrap: wrap; gap: var(--space-md); align-items: center; padding-block: var(--space-md); }
+header.site .bar { display: flex; flex-wrap: wrap; gap: var(--space-md); align-items: center; padding-block: var(--space-md); }
 header.site nav { display: flex; flex-wrap: wrap; gap: var(--space-lg); align-items: center; margin-left: auto; font-weight: 500; font-size: var(--text-sm); }
 header.site .tools { display: flex; align-items: center; gap: var(--space-2xs); }
 header.site a { color: var(--color-ink); text-decoration: none; }
 header.site nav a { text-decoration: underline; text-decoration-color: transparent; transition: text-decoration-color var(--dur-short) var(--ease-out); }
 header.site nav a:hover, header.site nav a[aria-current='page'] { text-decoration-color: var(--color-ink); }
 .brand { font-family: var(--font-display); font-weight: 600; font-size: var(--text-lg); }
-footer.site { border-top: var(--rule-hair) solid var(--color-rule); color: var(--color-muted); font-size: var(--text-sm); padding-block: var(--space-lg); }
+footer.site { color: var(--color-muted); font-size: var(--text-sm); padding-block: var(--space-lg); }
 a:hover { text-decoration-color: var(--color-accent); }
 .menu-toggle { display: none; place-items: center; width: 2.25rem; height: 2.25rem; padding: 0; color: var(--color-ink); background: none; border: var(--rule-hair) solid transparent; border-radius: var(--radius-pill); cursor: pointer; transition: background-color var(--dur-short) var(--ease-out); }
 .menu-toggle:hover { background: var(--tint-moss); }
@@ -48,7 +48,7 @@ a:hover { text-decoration-color: var(--color-accent); }
 /* shared with the subpages */
 .lead { color: var(--color-muted); }
 h2 { margin-top: var(--space-2xl); }
-.grid { display: grid; gap: var(--space-md); margin-top: var(--space-md); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr)); gap: var(--space-md); margin-top: var(--space-xl); }
 .card { background: var(--color-paper-2); border-radius: var(--radius-card); padding: var(--space-md) var(--space-lg); }
 .card h2 { margin: 0 0 var(--space-2xs); font-size: var(--text-title); }
 .card p { margin: var(--space-2xs) 0 var(--space-sm); }
@@ -129,6 +129,7 @@ h2 { margin-top: var(--space-2xl); }
 .topics a { grid-template-columns: minmax(0, 1fr); }
 
 /* project detail */
+.split-text > h1 { margin-block: var(--space-lg); }
 .detail h2 { font-size: var(--text-xl); margin-top: var(--space-xl); }
 .detail ul { margin: var(--space-sm) 0 0; padding-left: 1.2em; max-width: 65ch; }
 .detail li + li { margin-top: var(--space-sm); }
@@ -146,17 +147,35 @@ h2 { margin-top: var(--space-2xl); }
 .cv-row .tags li { font-size: var(--text-sm); padding: var(--space-2xs) var(--space-sm); border-color: transparent; background: var(--tint-moss); color: var(--color-ink); }
 @media (max-width: 40rem) { .cv-row { grid-template-columns: minmax(0, 1fr); gap: var(--space-2xs); } }
 
-/* margin art: decorative animation, shown only inside the split layout below */
+/* The stage: every page is split into a jade field on the left and the text on the right. The stage carries
+ * the page's picture: the portrait on the home page, the animation on project and interest pages, otherwise
+ * the page title set large. On wide screens the stage takes the free width, the text column stays readable.
+ * Below 64rem the stage becomes a band above the text (portrait, title) or disappears (animations). */
+:root { --color-stage: light-dark(var(--jade-ink), color-mix(in srgb, var(--jade-ink) 88%, var(--jade-slate))); }
 .margin-art { display: none; }
-
-/* pages with an animation (projects and interests): wide layout, large animation on the left, text bound to the right */
-.wrap--wide { max-width: 80rem; }
+.split-text { padding: var(--space-xl) var(--edge) var(--space-3xl); }
+.split-art { margin: 0; background: var(--color-stage); container-type: inline-size; }
+/* inside the stage every token resolves to its dark value, in both themes (the stage itself stays outside) */
+.split-art > * { color-scheme: dark; }
+.split-art:has(> .margin-art) { display: none; }
+.split--title .split-art { padding: var(--space-2xl) var(--edge) var(--space-xl); }
+.split--title .split-art h1 { max-width: none; font-size: clamp(2.25rem, 13.5cqi, 8.5rem); line-height: 0.98; hyphens: auto; }
 @media (min-width: 64rem) {
-  .split { display: grid; grid-template-columns: clamp(12rem, 18vw, 17rem) minmax(0, 44rem); justify-content: space-between; gap: var(--space-2xl); align-items: start; }
-  .split .margin-art { display: block; position: static; width: 100%; height: auto; }
+  .split { display: grid; grid-template-columns: minmax(18rem, 1fr) minmax(0, 60rem) minmax(0, 0.3fr); min-height: calc(100svh - 4.25rem); }
+  .split--portrait { grid-template-columns: minmax(22rem, 1fr) minmax(0, 54rem) minmax(0, 0.3fr); }
+  .split-art { grid-column: 1; grid-row: 1; overflow: clip; }
+  /* the text keeps its own height (the music equalizer measures it; stretching it would feed back) */
+  .split-text { grid-column: 2; align-self: start; padding: var(--space-3xl) clamp(var(--space-xl), 5vw, var(--space-3xl)) var(--space-4xl); }
+  .split-art:has(> .margin-art) { position: relative; display: flex; justify-content: center; align-items: flex-start; padding: var(--space-3xl) var(--space-lg); }
+  /* the page-long animations (gaming, keyboards, music) measure the text and grow with it */
+  .split .margin-art { display: block; flex: none; width: clamp(14rem, 20vw, 30rem); max-width: 100%; height: auto; }
+  .split .keyboard { width: clamp(16rem, 26vw, 36rem); }
+  /* animations with a fixed drawing fill the whole stage, as large as their proportions allow, and scroll with
+   * the page; absolute so they never make the page longer than the text */
+  .split .margin-art:not(.gamepad, .keyboard, .equalizer) { position: absolute; top: var(--space-3xl); left: var(--space-lg); width: calc(100% - 2 * var(--space-lg)); height: calc(100% - 2 * var(--space-3xl)); max-width: none; }
+  .split--title .split-art { padding: var(--space-3xl) var(--edge); }
+  .split--title .split-art h1 { position: sticky; top: var(--space-3xl); }
 }
-@media (min-width: 64rem) { .split:has(.keyboard) { grid-template-columns: clamp(14rem, 24vw, 22rem) minmax(0, 44rem); } }
-@media (max-width: 63.99rem) { .split-art { display: none; } }
 
 /* animation: scan (Stackscan page) */
 .scan text { font-family: var(--font-body); font-size: 11px; fill: var(--color-muted); }
@@ -210,13 +229,15 @@ h2 { margin-top: var(--space-2xl); }
 .btn--primary { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-accent-ink); }
 .btn--primary:hover { background: color-mix(in srgb, var(--color-accent) 85%, var(--color-paper)); }
 
-/* home: about me */
-.about { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: var(--space-2xl); align-items: center; }
+/* home: the portrait fills the stage, about me beside it */
 .about h1 { max-width: 12ch; }
 .about .lead { margin-top: var(--space-lg); color: var(--color-ink-2); }
 .about .actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-xl); }
-.portrait { margin: 0; }
-.portrait img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 20%; border-radius: var(--radius-card); outline: var(--rule-hair) solid var(--color-rule); outline-offset: -1px; }
+.portrait img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; object-position: 50% 22%; }
+@media (min-width: 64rem) {
+  .portrait img { position: sticky; top: 0; height: min(100svh, 100%); min-height: 36rem; aspect-ratio: auto; }
+  .split--portrait .split-text { align-self: center; }
+}
 
 .more { margin-top: var(--space-3xl); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: var(--space-2xl); }
 .more h2 { margin-top: 0; font-size: var(--text-section); }
@@ -232,9 +253,8 @@ h2 { margin-top: var(--space-2xl); }
 .closing p { margin-top: var(--space-md); color: var(--jade-sage); }
 
 @media (max-width: 48rem) {
-  .about, .more { grid-template-columns: minmax(0, 1fr); gap: var(--space-xl); }
+  .more { grid-template-columns: minmax(0, 1fr); gap: var(--space-xl); }
   .index a { grid-template-columns: minmax(0, 1fr); gap: var(--space-2xs); }
-  .portrait img { aspect-ratio: 4 / 3; }
 }
 
 /* animation: game interface (Gaming page) */
@@ -367,6 +387,10 @@ h2 { margin-top: var(--space-2xl); }
   html, body { background: transparent; }
   header.site, footer.site, .cv-actions, .toast, .hud, .gitlog { display: none !important; }
   .print-name { display: block; font-size: var(--text-sm); color: var(--color-muted); margin: 0 0 var(--space-sm); }
+  .split { display: block; min-height: 0; }
+  .split .split-art, .split .split-text { padding: 0 var(--gutter); background: none; }
+  .split-art > * { color-scheme: light; }
+  .split--title .split-art h1 { position: static; font-size: var(--text-display); line-height: 1.05; }
   .cv h2 { margin-top: var(--space-xl); break-after: avoid; }
   .cv-row { break-inside: avoid; }
 }

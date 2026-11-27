@@ -10,7 +10,9 @@ const lang = Astro.params.lang as Lang;
 const tr = t(lang);
 ---
 <Base lang={lang} title={tr.imprint.title} path="impressum/" description={lang === 'de' ? 'Impressum von Tim Kibele.' : 'Legal notice of Tim Kibele.'}>
-  <h1>{tr.imprint.title}</h1>
+  <div class="split split--title">
+  <div class="split-art"><h1>{tr.imprint.title}</h1></div>
+  <div class="split-text">
 
   {lang === 'de' ? (
     <>
@@ -29,4 +31,6 @@ const tr = t(lang);
       <p>Email: <Email /></p>
     </>
   )}
+  </div>
+  </div>
 </Base>

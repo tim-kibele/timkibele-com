@@ -2,8 +2,8 @@
 import '../styles/global.css';
 import { t, other, type Lang } from '../i18n/ui';
 
-interface Props { lang: Lang; title?: string; description?: string; path: string; wide?: boolean }
-const { lang, title, description, path, wide = false } = Astro.props;
+interface Props { lang: Lang; title?: string; description?: string; path: string }
+const { lang, title, description, path } = Astro.props;
 const tr = t(lang);
 const pageTitle = title ? `${title} · ${tr.siteTitle}` : tr.siteTitle;
 const desc = description ?? tr.tagline;
@@ -47,7 +47,7 @@ const nav = [
   </head>
   <body>
     <header class="site">
-      <div class={wide ? 'wrap wrap--wide' : 'wrap'}>
+      <div class="bar">
         <a class="brand" href={href('')} aria-current={Astro.url.pathname === href('') ? 'page' : undefined}>{tr.siteTitle}</a>
         <nav id="site-nav">
           {nav.map(([p, label]) => (
@@ -66,9 +66,9 @@ const nav = [
         </button>
       </div>
     </header>
-    <main class={wide ? 'wrap wrap--wide' : 'wrap'}><slot /></main>
+    <main><slot /></main>
     <footer class="site">
-      <div class={wide ? 'wrap wrap--wide' : 'wrap'}>
+      <div class="bar">
         © {new Date().getFullYear()} Tim Kibele · <a href={href('impressum/')}>{tr.nav.imprint}</a> · <a href={href('datenschutz/')}>{tr.nav.legal}</a>
       </div>
     </footer>

@@ -11,7 +11,9 @@ const tr = t(lang);
 const a = tr.achievements;
 ---
 <Base lang={lang} title={a.title} description={a.intro} path="geheimnisse/">
-  <h1>{a.title}</h1>
+  <div class="split split--title">
+  <div class="split-art"><h1>{a.title}</h1></div>
+  <div class="split-text">
   <p class="lead">{a.intro}</p>
   <p class="ach-count" aria-live="polite"><span data-count>0</span> {a.of} {eggs.length}</p>
 
@@ -32,6 +34,8 @@ const a = tr.achievements;
   </ul>
 
   <p class="ach-note">{a.local} <button class="ach-reset" type="button">{a.reset}</button></p>
+  </div>
+  </div>
 </Base>
 
 <script>

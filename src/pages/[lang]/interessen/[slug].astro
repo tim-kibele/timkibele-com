@@ -34,15 +34,15 @@ const blocks = (item.data.text?.[lang] ?? tr.interests.note).split(/\n\s*\n/).ma
   return { text: b };
 });
 const firstText = blocks.findIndex((b) => 'text' in b);
-const split = Animation !== null;
+// Mit Animation steht sie auf der Bühne links, sonst der Seitentitel.
 ---
-<Base lang={lang} title={title} description={tr.interests.intro} path={`interessen/${slug}/`} wide={split}>
-  <div class={split ? 'split' : undefined}>
-  {Animation && <div class="split-art"><Animation /></div>}
-  <div class={split ? 'split-text' : undefined}>
+<Base lang={lang} title={title} description={tr.interests.intro} path={`interessen/${slug}/`}>
+  <div class={Animation ? 'split' : 'split split--title'}>
+  <div class="split-art">{Animation ? <Animation /> : <h1>{title}</h1>}</div>
+  <div class="split-text">
   <p><a href={`/${lang}/interessen/`}>← {tr.back}</a></p>
   <section class="topic">
-    <h1>{title}</h1>
+    {Animation && <h1>{title}</h1>}
     {blocks.map((b, i) =>
       'heading' in b ? <h2>{b.heading}</h2>
       : 'race' in b ? <TypeRace lang={lang} />
