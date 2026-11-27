@@ -48,7 +48,8 @@ a:hover { text-decoration-color: var(--color-accent); }
 /* shared with the subpages */
 .lead { color: var(--color-muted); }
 h2 { margin-top: var(--space-2xl); }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr)); gap: var(--space-md); margin-top: var(--space-xl); }
+/* projects: one card per row, so the list reads top to bottom like the stone tower beside it */
+.grid { display: grid; gap: var(--space-md); margin-top: var(--space-xl); }
 .card { background: var(--color-paper-2); border-radius: var(--radius-card); padding: var(--space-md) var(--space-lg); }
 .card h2 { margin: 0 0 var(--space-2xs); font-size: var(--text-title); }
 .card p { margin: var(--space-2xs) 0 var(--space-sm); }
